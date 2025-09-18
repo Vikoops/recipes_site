@@ -558,3 +558,43 @@ ul.lang-list li a:hover {color: #fdc073;}
   background: url("../images/logo.png") no-repeat 12px center / 36px 36px;
   /* ↑ 12px от левого края, по вертикали по центру, принудительный размер 36×36 */
 }
+
+.detail-cover{display:block;max-width:720px;width:100%;height:auto;border-radius:16px;margin:0 auto 16px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.recipe-detail .meta{color:#6b5a4b;margin:8px 0 12px;}
+.recipe-detail .lead{font-size:18px;line-height:1.6;color:#4a3d33;}
+
+/* Панель поиска/фильтров: делаем видимой и аккуратной */
+.filters{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0 16px;
+  padding: 12px;
+  background: var(--paper);           /* светлая карточка */
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: relative;
+  z-index: 1;
+}
+.filters input[type="text"],
+.filters select{
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+.filters .btn{
+  min-height: 40px;
+  padding: 8px 14px;
+}
+
+/* Доп.отступ под фиксированной шапкой */
+:root { --header-extra-gap: 20px; }      /* можешь менять 20 → 28/32 по вкусу */
+body {
+  padding-top: calc(var(--header-h) + var(--header-extra-gap));
+}
+
+/* Чуть ниже сама панель фильтров (необязательно, но приятно) */
+.filters { margin-top: 12px; }

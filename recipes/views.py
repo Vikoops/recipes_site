@@ -1,46 +1,32 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
+from .models import Recipe
+from django.db.models import Q
 
 MENU = [
     {'title': 'Главная', 'url_name': 'home'},
     {'title': 'О сайте', 'url_name': 'about'},
 ]
 
-RECIPES_DB = [
-    {
-        'id': 1,
-        'title': 'Шоколадный брауни',
-        'image': 'recipes/images/ChocolateBrownie.png',
-        'desc': 'Плотный и влажный брауни с насыщенным шоколадным вкусом.',
-        'cook_time': '45 мин',
-        'difficulty': 'средняя',
-        'is_published': True,
-    },
-    {
-        'id': 2,
-        'title': 'Томатный суп',
-        'image': 'recipes/images/TomatoSoup.png',
-        'desc': 'Классический томатный суп с базиликом и чесноком.',
-        'cook_time': '30 мин',
-        'difficulty': 'простая',
-        'is_published': True,
-    },
-    {
-        'id': 3,
-        'title': 'Смузи из манго',
-        'image': None,
-        'desc': 'Освежающий смузи. (Скрыт для примера фильтрации).',
-        'cook_time': '5 мин',
-        'difficulty': 'простая',
-        'is_published': False,
-    },
-]
-
 def index(request):
+    sort_by = request.GET.get('sort', '-created_at')  # '-created_at' | 'title' | '-title'
+    q = request.GET.get('q', '').strip()
+    diff = request.GET.get('difficulty', '')  # 'easy'|'medium'|'hard'|''
+
+    recipes = Recipe.published.all()  # базово — только опубликованные
+
+    if q:
+        recipes = recipes.filter(Q(title__icontains=q) | Q(desc__icontains=q))
+    if diff in dict(Recipe.Difficulty.choices):
+        recipes = recipes.filter(difficulty=diff)
+
+    recipes = recipes.order_by(sort_by)
+
     ctx = {
         'title': 'Новые рецепты',
-        'menu': MENU,
-        'recipes': [r for r in RECIPES_DB if r['is_published']],
+        'recipes': recipes,
+        'sort_by': sort_by, 'q': q, 'diff': diff,
+        'difficulty_choices': Recipe.Difficulty.choices,
         'year': 2025,
     }
     return render(request, 'recipes/index.html', ctx)
@@ -48,8 +34,6 @@ def index(request):
 def about(request):
     return render(request, 'recipes/about.html', {'title': 'О сайте', 'year': 2025})
 
-def recipe_detail(request, recipe_id: int):
-    rec = next((r for r in RECIPES_DB if r['id'] == recipe_id), None)
-    if not rec:
-        return HttpResponse("Рецепт не найден", status=404)
-    return HttpResponse(f"<h1>{rec['title']}</h1><p>{rec['desc']}</p>")
+def recipe_detail_slug(request, slug):
+    recipe = get_object_or_404(Recipe, slug=slug, is_published=True)
+    return render(request, 'recipes/detail.html', {'recipe': recipe, 'title': recipe.title, 'year': 2025})

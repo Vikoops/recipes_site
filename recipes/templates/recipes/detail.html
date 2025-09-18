@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} — Рецепты{% endblock %}
+{% block content %}
+  <article class="recipe-detail">
+    {% if recipe.image %}
+      <p><img src="{% static recipe.image %}" alt="{{ recipe.title }}" class="detail-cover"></p>
+    {% endif %}
+    <h1>{{ recipe.title }}</h1>
+    <p class="meta">⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}</p>
+    <p class="lead">{{ recipe.desc }}</p>
+  </article>
+{% endblock %}

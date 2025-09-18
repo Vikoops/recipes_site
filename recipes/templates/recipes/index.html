@@ -1,10 +1,28 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}Главная — Рецепты{% endblock %}
-
 {% block content %}
-  <h1 class="page-title">{{ title }}</h1>
 
+  <!-- ФОРМА ПОИСКА/ФИЛЬТРОВ/СОРТИРОВКИ -->
+  <form method="get" class="filters">
+    <input type="text" name="q" placeholder="Поиск..." value="{{ q }}">
+    <select name="difficulty">
+      <option value="">Любая сложность</option>
+      {% for val,label in difficulty_choices %}
+        <option value="{{ val }}" {% if diff == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="sort">
+      <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Сначала новые</option>
+      <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Название (А→Я)</option>
+      <option value="-title" {% if sort_by == '-title' %}selected{% endif %}>Название (Я→А)</option>
+    </select>
+    <button class="btn">Применить</button>
+  </form>
+
+  <!-- Список карточек -->
+  <h1 class="page-title">{{ title }}</h1>
   <ul class="card-list">
     {% for r in recipes %}
       <li class="card">
@@ -20,11 +38,12 @@
           <p class="card-desc">{{ r.desc }}</p>
           <ul class="meta">
             <li>⏱ {{ r.cook_time }}</li>
-            <li>🥣 Сложность: {{ r.difficulty }}</li>
+            <li>🥣 Сложность: {{ r.get_difficulty_display }}</li>
           </ul>
-          <p><a class="btn" href="{% url 'recipe_detail' r.id %}">Читать рецепт</a></p>
+          <p><a class="btn" href="{{ r.get_absolute_url }}">Читать рецепт</a></p>
         </div>
       </li>
     {% endfor %}
   </ul>
+
 {% endblock %}
