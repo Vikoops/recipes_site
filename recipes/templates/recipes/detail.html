@@ -8,6 +8,18 @@
       <p><img src="{% static recipe.image %}" alt="{{ recipe.title }}" class="detail-cover"></p>
     {% endif %}
     <h1>{{ recipe.title }}</h1>
+    {% if recipe.category %}
+  <p class="meta">Категория: <a href="{{ recipe.category.get_absolute_url }}">{{ recipe.category.name }}</a></p>
+{% endif %}
+
+{% if recipe.tags.all %}
+  <ul class="tags">
+    {% for t in recipe.tags.all %}
+      <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
     <p class="meta">⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}</p>
     <p class="lead">{{ recipe.desc }}</p>
   </article>

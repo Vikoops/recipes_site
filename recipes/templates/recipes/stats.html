@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Статистика — Рецепты{% endblock %}
+{% block content %}
+  <h1 class="page-title">Статистика</h1>
+
+  <h2>Рецептов по категориям</h2>
+  <table class="tbl">
+    <tr><th>Категория</th><th>Кол-во</th></tr>
+    {% for row in per_category %}
+      <tr><td>{{ row.name|default:"—" }}</td><td>{{ row.cnt }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Время готовки по категориям (мин)</h2>
+  <table class="tbl">
+    <tr><th>Категория</th><th>Среднее</th><th>Мин</th><th>Макс</th></tr>
+    {% for row in cook_stats %}
+      <tr>
+        <td>{{ row.category__name|default:"—" }}</td>
+        <td>{{ row.avg|floatformat:1 }}</td>
+        <td>{{ row.mn }}</td>
+        <td>{{ row.mx }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Рецептов по сложности</h2>
+  <table class="tbl">
+    <tr><th>Сложность</th><th>Кол-во</th></tr>
+    {% for row in per_difficulty %}
+      <tr><td>{{ row.difficulty }}</td><td>{{ row.cnt }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <h2>Примеры выражений (Concat + Value + F)</h2>
+  <ul>
+    {% for s in samples %}
+      <li><a href="{% url 'recipe_detail_slug' s.slug %}">{{ s.title_with_time }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Рецепты по тегу {{ tag.name }}{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Рецепты по тегу: {{ tag.name }}</h1>
+
+  {% if recipes %}
+    <ul class="card-list">
+      {% for r in recipes %}
+        <li class="card">
+          <div class="card-media">
+            {% if r.image %}
+              <img src="{% static r.image %}" alt="{{ r.title }}">
+            {% else %}
+              <div class="noimg">Нет изображения</div>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">{{ r.title }}</h2>
+            <p class="card-desc">{{ r.desc }}</p>
+            <ul class="meta">
+              <li>⏱ {{ r.cook_time }}</li>
+              <li>🥣 Сложность: {{ r.get_difficulty_display }}</li>
+            </ul>
+            <p><a class="btn" href="{{ r.get_absolute_url }}">Читать рецепт</a></p>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>По этому тегу пока нет рецептов.</p>
+  {% endif %}
+{% endblock %}

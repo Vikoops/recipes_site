@@ -14,9 +14,12 @@
     <div class="inner">
       <a href="{% url 'home' %}" class="logo">Рецепты</a>
       <nav class="main-nav">
-        <a href="{% url 'home' %}">Главная</a>
-        <a href="{% url 'about' %}">О сайте</a>
-      </nav>
+  <a href="{% url 'home' %}">Главная</a>
+  <a href="{% url 'tag_list' %}">Теги</a>
+  <a href="{% url 'stats' %}">Статистика</a>
+  <a href="{% url 'about' %}">О сайте</a>
+</nav>
+
     </div>
   </header>
 
