@@ -1,0 +1,277 @@
+/* ===== РЕЦЕПТЫ — КАСТОМ АДМИНКИ =====
+   Файл: /static/recipes/css/admin-overrides.css
+   Палитра и общий тон
+*/
+:root{
+  --brand:#7B3F00;          /* коричневый */
+  --brand-2:#5e2f00;        /* темнее */
+  --brand-3:#a45a1a;        /* светлее */
+  --ink:#2b2622;
+  --muted:#6c625a;
+  --paper:#fff;
+  --paper-2:#faf7f3;
+  --line:#ead9c6;
+  --badge:#f7efe6;
+  --focus:#ffbf66;          /* акцент фокуса */
+  --ok:#1a7f37; --warn:#b7791f; --err:#c53030;
+}
+
+/* тестовый маркер можно убрать */
+body:after{
+  content:"";
+  display:none;
+}
+
+/* ===== ШАПКА И ХЛЕБНЫЕ КРОШКИ ===== */
+#header { background: var(--brand); border-bottom: 3px solid var(--brand-2); }
+#header a:link, #header a:visited { color:#fff; }
+#user-tools a:hover { text-decoration: underline; }
+
+div.breadcrumbs{
+  background: var(--brand-2);
+  color:#fff;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+/* ===== ОБЩИЕ УЛУЧШЕНИЯ ===== */
+body, input, select, textarea {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+.content { padding-top: 18px; }
+
+/* карточные блоки админки */
+.module, .inline-group, .tabular inline-related {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 1px 10px rgba(0,0,0,.04);
+  overflow: hidden;
+}
+
+/* заголовки таблиц/блоков */
+.module caption,
+#changelist .module caption{
+  background: var(--badge);
+  color: var(--ink);
+  font-weight: 700;
+  border-bottom: 1px solid var(--line);
+}
+
+/* поля ввода */
+input[type=text], input[type=number], input[type=email],
+input[type=password], select, textarea{
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  padding: 7px 10px !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.03);
+}
+input:focus, select:focus, textarea:focus{
+  outline: none !important;
+  border-color: var(--brand-3) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 24%, transparent);
+}
+
+/* кнопки */
+.button, .submit-row input, input[type=submit], a.button{
+  background: var(--brand);
+  border-color: var(--brand-2);
+  color:#fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 600;
+}
+.button:hover, .submit-row input:hover, a.button:hover{
+  filter: brightness(1.06);
+}
+.button.default, .submit-row input.default { background: var(--brand-3); }
+.deletelink{ background: var(--err); border-color:#a12222; }
+
+/* нижняя панель сохранения */
+.submit-row{
+  background: var(--paper-2);
+  border-top: 1px solid var(--line);
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* ===== САЙДБАР (меню слева) ===== */
+#nav-sidebar{
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+}
+#nav-sidebar .current-model{ background: var(--badge); }
+#nav-sidebar .app-recipes .model a { font-weight: 600; }
+
+/* ===== СПИСОК ЗАПИСЕЙ (changelist) ===== */
+.change-list .actions{
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+#changelist-search{
+  margin: 10px 0 14px;
+}
+#changelist-search input[type="text"]{
+  min-width: 280px;
+}
+
+/* таблица результатов */
+.change-list .results table{
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.change-list .results table thead th{
+  background: var(--badge);
+  border-bottom: 1px solid var(--line);
+}
+.change-list .results table tbody tr:nth-child(odd){
+  background: #fff;
+}
+.change-list .results table tbody tr:nth-child(even){
+  background: #fdfaf6;
+}
+.change-list .results table tbody tr:hover{
+  background: #fff7e8;
+}
+.change-list .results table td, .change-list .results table th{
+  vertical-align: middle;
+  padding: 10px 12px;
+}
+
+/* чекбоксы действий — чуть крупнее */
+.action-checkbox input{ transform: scale(1.12); }
+
+/* бейдж количества (в админ-списках) */
+td .inline-deletelink{ border-radius: 8px; }
+th .sorted .sortoptions{ opacity:.9; }
+
+/* ===== ФИЛЬТРЫ СПРАВА ===== */
+#changelist-filter{
+  background: var(--paper);
+  border:1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+}
+#changelist-filter h2{
+  background: none;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  margin: -10px -10px 8px;
+  padding: 10px;
+}
+
+/* ===== ИНЛАЙНЫ ===== */
+.inline-group .inline-related{
+  border-top: 1px solid var(--line);
+}
+.inline-group .inline-related h3{
+  background: var(--paper-2);
+}
+
+/* ===== МАЛЕНЬКИЕ ШТРИХИ ===== */
+a.addlink, a.changelink, a.deletelink, .object-tools a{
+  border-radius: 10px !important;
+}
+.object-tools a{
+  background: var(--brand);
+  border-color: var(--brand-2);
+}
+.object-tools a:hover{ filter:brightness(1.06); }
+
+/* сообщения */
+.messagelist{
+  border-radius: 12px;
+  overflow:hidden;
+}
+.messagelist li{
+  padding: 10px 14px;
+  border-bottom: 1px solid #0001;
+}
+.messagelist li.success{ background: color-mix(in srgb, var(--ok) 10%, #fff); }
+.messagelist li.warning{ background: color-mix(in srgb, var(--warn) 12%, #fff); }
+.messagelist li.error{ background: color-mix(in srgb, var(--err) 12%, #fff); }
+
+/* пагинация */
+.paginator {
+  border-top: 1px solid var(--line);
+}
+.paginator a, .paginator span.this-page{
+  border:1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px 10px;
+  margin-right: 6px;
+  background:#fff;
+}
+.paginator span.this-page{
+  background: var(--badge);
+  font-weight:700;
+}
+
+/* фокусные обводки */
+:focus-visible{
+  outline: 3px solid color-mix(in srgb, var(--focus) 50%, transparent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* поддержка тёмных тем Windows/браузера — слегка приглушим бумагу */
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#fdfbf9;
+    --paper-2:#fbf5ef;
+  }
+}
+
+/* === БОЛЕЕ КОНТРАСТНЫЙ САЙДБАР АДМИНКИ === */
+#nav-sidebar{
+  color:#2b2622;
+}
+
+/* заголовки блоков ("RECIPES", "ПОЛЬЗОВАТЕЛИ И ГРУППЫ") */
+#nav-sidebar .module caption{
+  background:#f1e6d6;          /* чётче фон */
+  color:#2b2622;                /* темнее текст */
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+/* строки и ссылки внутри списков моделей */
+#nav-sidebar .model a:link,
+#nav-sidebar .model a:visited{
+  color:#2b2622;                /* тёмный текст */
+  font-weight:700;
+  text-decoration:none;
+}
+#nav-sidebar .model a:hover{
+  color:#000;                   /* максимально контрастно при ховере */
+}
+
+/* «Добавить» справа — тоже темнее */
+#nav-sidebar td a.addlink:link,
+#nav-sidebar td a.addlink:visited{
+  color:#2b2622;
+  opacity:1;                    /* убираем возможную полупрозрачность темы */
+}
+
+/* активная строка в сайдбаре — читаемая */
+#nav-sidebar .current-model{
+  background:#f7efe6;
+}
+#nav-sidebar .current-model a{
+  color:#000;
+  font-weight:800;
+}
+/* === Контрастные заголовки секций админки === */
+#nav-sidebar .module caption,
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: #a06d2a;    /* тёмный фон */
+    color: #fdc073;         /* светлый контрастный текст */
+    font-weight: bold;
+    padding: 6px 10px;
+    text-transform: uppercase;
+}
