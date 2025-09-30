@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-wrap">
+  <div class="form-head">
+    <h1 class="page-title" style="margin-bottom:4px">{{ title }}</h1>
+    <div class="form-sub">Заполните поля ниже, все проверки происходят прямо при отправке.</div>
+  </div>
+
+  {# сообщения Django #}
+  {% if messages %}
+    <ul class="msgs">
+      {% for m in messages %}
+        <li class="{{ m.tags|default:'' }}">{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {# общие ошибки формы #}
+  {% if form.non_field_errors %}
+    <div class="form-errors">
+      <ul class="errorlist">
+        {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate class="form-card">
+    {% csrf_token %}
+
+    <div class="form-grid form-grid--spaced">
+
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.title.id_for_label }}">Название</label>
+        {{ form.title }}
+        {% if form.title.help_text %}<div class="form-help">{{ form.title.help_text }}</div>{% endif %}
+        {{ form.title.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.slug.id_for_label }}">Слаг (латиница)</label>
+        {{ form.slug }}
+        {% if form.slug.help_text %}<div class="form-help">{{ form.slug.help_text }}</div>{% endif %}
+        {{ form.slug.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.difficulty.id_for_label }}">Сложность</label>
+        {{ form.difficulty }}
+        {{ form.difficulty.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.cook_time_min.id_for_label }}">Время (мин)</label>
+        {{ form.cook_time_min }}
+        {{ form.cook_time_min.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.cook_time.id_for_label }}">Время (текст)</label>
+        {{ form.cook_time }}
+        {{ form.cook_time.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.category.id_for_label }}">Категория</label>
+        {{ form.category }}
+        {{ form.category.errors }}
+      </div>
+
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.tags.id_for_label }}">Теги</label>
+        {{ form.tags }}
+        {{ form.tags.errors }}
+      </div>
+
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.desc.id_for_label }}">Описание</label>
+        {{ form.desc }}
+        {% if form.desc.help_text %}<div class="form-help">{{ form.desc.help_text }}</div>{% endif %}
+        {{ form.desc.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.is_published.id_for_label }}">Опубликован</label>
+        {{ form.is_published }}
+        {{ form.is_published.errors }}
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'home' %}" class="btn ghost">Отмена</a>
+      <button class="btn primary" type="submit">Добавить рецепт</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

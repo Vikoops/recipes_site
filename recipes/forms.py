@@ -1,5 +1,5 @@
-# recipes/forms.py
 from django import forms
+from .models import Recipe, Category, Tag
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 
@@ -73,3 +73,65 @@ class SuggestRecipeForm(forms.Form):
             # не критично, но покажем предупреждение в верхнем блоке ошибок
             raise ValidationError("Заголовок не должен полностью повторяться в описании.")
         return cleaned
+
+
+def validate_no_super(value: str):
+    if "супер" in value.lower():
+        raise ValidationError("Избегайте слова «супер» в названии :)")
+
+class RecipeModelForm(forms.ModelForm):
+    """Шаг 2: форма, связанная с моделью Recipe (без загрузки файлов — это шаг 3)."""
+    class Meta:
+        model = Recipe
+        fields = [
+            'title', 'slug', 'desc',
+            'cook_time', 'cook_time_min',
+            'difficulty', 'is_published',
+            'category', 'tags',
+            # photo добавим на шаге 3
+        ]
+        labels = {
+            'title': 'Название',
+            'slug': 'Слаг (латиница)',
+            'desc': 'Описание',
+            'cook_time': 'Время (текст)',
+            'cook_time_min': 'Время (мин)',
+            'difficulty': 'Сложность',
+            'is_published': 'Опубликован',
+            'category': 'Категория',
+            'tags': 'Теги',
+        }
+        help_texts = {
+            'slug': 'Только латинские буквы, цифры и дефисы. Должен быть уникальным.',
+        }
+        widgets = {
+            'desc': forms.Textarea(attrs={'rows': 5}),
+        }
+
+    # добавим встроенные + свои валидаторы
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'].validators += [MinLengthValidator(3), MaxLengthValidator(100), validate_no_super]
+        self.fields['cook_time_min'].validators += [MinValueValidator(1), MaxValueValidator(600)]
+
+    # пример доп. проверки поля
+    def clean_title(self):
+        title = self.cleaned_data['title'].strip()
+        if not title[0].isalpha():
+            raise ValidationError("Название должно начинаться с буквы.")
+        return title
+
+    # межполевой контроль: если cook_time пустой, но cook_time_min задан — всё ок, а вот наоборот — предупредим
+    def clean(self):
+        cleaned = super().clean()
+        cook_text = (cleaned.get('cook_time') or '').strip()
+        cook_min = cleaned.get('cook_time_min')
+
+        # если минутa есть, а текст пустой — автозаполним "N мин"
+        if cook_min and not cook_text:
+            cleaned['cook_time'] = f"{cook_min} мин"
+
+        # если наоборот: есть текст, а минут нет — оставляем (пользовательское описание),
+        # но рекомендуем всё же заполнить минуты для статистики/фильтрации
+        return cleaned
+

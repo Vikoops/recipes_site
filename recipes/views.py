@@ -1,11 +1,11 @@
 from django.db import models
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, F, Value, Count, Avg, Min, Max
 from django.db.models.functions import Concat, Cast
 from django.shortcuts import render
 from django.contrib import messages
 from .models import Recipe, Category, Tag
-from .forms import SuggestRecipeForm
+from .forms import SuggestRecipeForm, RecipeModelForm
 MENU = [
     {'title': 'Главная', 'url_name': 'home'},
     {'title': 'О сайте', 'url_name': 'about'},
@@ -121,3 +121,23 @@ def suggest_recipe(request):
 
     ctx = {"form": form, "title": "Предложить рецепт", "year": 2025}
     return render(request, "recipes/suggest.html", ctx)
+
+
+
+def add_recipe_model(request):
+    """
+    Шаг 2: добавление рецепта через ModelForm.
+    Сейчас БЕЗ поля загрузки файла (его подключим на шаге 3).
+    """
+    if request.method == "POST":
+        form = RecipeModelForm(request.POST)
+        if form.is_valid():
+            recipe = form.save()  # сохранится в БД
+            messages.success(request, "Рецепт добавлен (ModelForm).")
+            return redirect(recipe.get_absolute_url())
+        else:
+            messages.error(request, "Исправьте ошибки формы.")
+    else:
+        form = RecipeModelForm()
+
+    return render(request, "recipes/add_model.html", {"form": form, "title": "Добавить рецепт"})
