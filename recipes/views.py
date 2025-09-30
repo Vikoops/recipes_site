@@ -2,7 +2,10 @@ from django.db import models
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q, F, Value, Count, Avg, Min, Max
 from django.db.models.functions import Concat, Cast
+from django.shortcuts import render
+from django.contrib import messages
 from .models import Recipe, Category, Tag
+from .forms import SuggestRecipeForm
 MENU = [
     {'title': 'Главная', 'url_name': 'home'},
     {'title': 'О сайте', 'url_name': 'about'},
@@ -99,3 +102,22 @@ def stats(request):
         'year': 2025,
     }
     return render(request, 'recipes/stats.html', ctx)
+
+def suggest_recipe(request):
+    """
+    Страница «Предложить рецепт». На этом шаге просто валидируем форму и показываем результат.
+    """
+    if request.method == "POST":
+        form = SuggestRecipeForm(request.POST)
+        if form.is_valid():
+            # тут в Лабе 10 шаг 1 НИЧЕГО не сохраняем — просто показываем успех и выведем очищенные данные
+            messages.success(request, "Спасибо! Форма валидна — данные приняты.")
+            ctx = {"form": SuggestRecipeForm(), "cleaned": form.cleaned_data, "title": "Предложить рецепт", "year": 2025}
+            return render(request, "recipes/suggest.html", ctx)
+        else:
+            messages.error(request, "Проверьте поля — есть ошибки.")
+    else:
+        form = SuggestRecipeForm()
+
+    ctx = {"form": form, "title": "Предложить рецепт", "year": 2025}
+    return render(request, "recipes/suggest.html", ctx)

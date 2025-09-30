@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Предложить рецепт — Рецепты{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Предложить рецепт</h1>
+
+  {# глобальные сообщения (messages.success / error) #}
+  {% if messages %}
+    <ul class="form-error">
+      {% for m in messages %}
+        <li>{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {# НЕпривязанные к полю ошибки (из clean) #}
+  {% if form.non_field_errors %}
+    <div class="form-error">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <p>
+      <label class="form-label" for="{{ form.title.id_for_label }}">Название:</label>
+      {{ form.title }}
+      {% if form.title.help_text %}<br><small>{{ form.title.help_text }}</small>{% endif %}
+      {% for err in form.title.errors %}<div class="form-error">{{ err }}</div>{% endfor %}
+    </p>
+
+    <p>
+      <label class="form-label" for="{{ form.email.id_for_label }}">Ваш e-mail:</label>
+      {{ form.email }}
+      {% if form.email.help_text %}<br><small>{{ form.email.help_text }}</small>{% endif %}
+      {% for err in form.email.errors %}<div class="form-error">{{ err }}</div>{% endfor %}
+    </p>
+
+    <p>
+      <label class="form-label" for="{{ form.cook_time_min.id_for_label }}">Время готовки:</label>
+      {{ form.cook_time_min }}
+      {% if form.cook_time_min.help_text %}<br><small>{{ form.cook_time_min.help_text }}</small>{% endif %}
+      {% for err in form.cook_time_min.errors %}<div class="form-error">{{ err }}</div>{% endfor %}
+    </p>
+
+    <p>
+      <label class="form-label" for="{{ form.difficulty.id_for_label }}">Сложность:</label>
+      {{ form.difficulty }}
+      {% for err in form.difficulty.errors %}<div class="form-error">{{ err }}</div>{% endfor %}
+    </p>
+
+    <p>
+      <label class="form-label" for="{{ form.desc.id_for_label }}">Краткое описание:</label>
+      {{ form.desc }}
+      {% if form.desc.help_text %}<br><small>{{ form.desc.help_text }}</small>{% endif %}
+      {% for err in form.desc.errors %}<div class="form-error">{{ err }}</div>{% endfor %}
+    </p>
+
+    <p>
+      <button class="btn form-button" type="submit">Отправить</button>
+    </p>
+  </form>
+
+  {# покажем, что именно прошло валидацию #}
+  {% if cleaned %}
+    <hr>
+    <h3>Данные прошли проверку!</h3>
+    
+  {% endif %}
+{% endblock %}
