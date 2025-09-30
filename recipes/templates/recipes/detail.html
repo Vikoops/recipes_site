@@ -4,9 +4,12 @@
 {% block title %}{{ title }} — Рецепты{% endblock %}
 {% block content %}
   <article class="recipe-detail">
-    {% if recipe.image %}
-      <p><img src="{% static recipe.image %}" alt="{{ recipe.title }}" class="detail-cover"></p>
-    {% endif %}
+    {% if recipe.photo %}
+  <img class="detail-img" src="{{ recipe.photo.url }}" alt="{{ recipe.title }}">
+{% elif recipe.image %}
+  <img class="detail-img" src="{% static recipe.image %}" alt="{{ recipe.title }}">
+{% endif %}
+
     <h1>{{ recipe.title }}</h1>
     {% if recipe.category %}
   <p class="meta">Категория: <a href="{{ recipe.category.get_absolute_url }}">{{ recipe.category.name }}</a></p>

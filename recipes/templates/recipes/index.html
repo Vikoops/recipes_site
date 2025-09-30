@@ -27,12 +27,15 @@
     {% for r in recipes %}
       <li class="card">
         <div class="card-media">
-          {% if r.image %}
-            <img src="{% static r.image %}" alt="{{ r.title }}">
-          {% else %}
-            <div class="noimg">Нет изображения</div>
-          {% endif %}
-        </div>
+  {% if r.photo %}
+    <img src="{{ r.photo.url }}" alt="{{ r.title }}">
+  {% elif r.image %}
+    <img src="{% static r.image %}" alt="{{ r.title }}">
+  {% else %}
+    <div class="noimg">Нет изображения</div>
+  {% endif %}
+</div>
+
         <div class="card-body">
           <h2 class="card-title">{{ r.title }}</h2>
           <p class="card-desc">{{ r.desc }}</p>

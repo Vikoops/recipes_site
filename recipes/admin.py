@@ -1,6 +1,8 @@
 from django.contrib import admin, messages
 from django import forms
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+
 from .models import Recipe, Category, Tag, RecipeInfo
 
 
@@ -23,7 +25,9 @@ def add_fast_tag(modeladmin, request, queryset):
     for obj in queryset:
         obj.tags.add(fast)
     modeladmin.message_user(
-        request, f"Тег «быстро» добавлен к {queryset.count()} рецептам.", level=messages.INFO
+        request,
+        f"Тег «быстро» добавлен к {queryset.count()} рецептам.",
+        level=messages.INFO,
     )
 
 
@@ -58,7 +62,7 @@ class RecipeInfoInline(admin.StackedInline):
     max_num = 1
 
 
-# ---------- ФОРМА (русские подписи + удобные виджеты) ----------
+# ---------- ФОРМА (подписи/виджеты) ----------
 class RecipeAdminForm(forms.ModelForm):
     class Meta:
         model = Recipe
@@ -71,6 +75,7 @@ class RecipeAdminForm(forms.ModelForm):
             "slug": "Слаг",
             "desc": "Описание",
             "image": "Путь к изображению",
+            "photo": "Фото",
             "cook_time": "Время (текст)",
             "cook_time_min": "Время (мин)",
             "difficulty": "Сложность",
@@ -93,16 +98,19 @@ class RecipeAdmin(admin.ModelAdmin):
     inlines = [RecipeInfoInline]
     empty_value_display = "—"
 
-    # «Русские» колонки (для заголовков списка)
-    def title_ru(self, obj): return obj.title
+    # «Русские» колонки/заголовки
+    def title_ru(self, obj):
+        return obj.title
     title_ru.short_description = "Название"
     title_ru.admin_order_field = "title"
 
-    def category_ru(self, obj): return obj.category
+    def category_ru(self, obj):
+        return obj.category
     category_ru.short_description = "Категория"
     category_ru.admin_order_field = "category"
 
-    def created_at_ru(self, obj): return obj.created_at
+    def created_at_ru(self, obj):
+        return obj.created_at
     created_at_ru.short_description = "Создано"
     created_at_ru.admin_order_field = "created_at"
 
@@ -126,42 +134,63 @@ class RecipeAdmin(admin.ModelAdmin):
     colored_difficulty.short_description = "Сложность"
     colored_difficulty.admin_order_field = "difficulty"
 
-    # Список
+    # миниатюра загруженного фото
+    def thumb(self, obj):
+        if getattr(obj, "photo", None):
+            return mark_safe(
+                f"<img src='{obj.photo.url}' width='80' "
+                "style='border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.2)'>"
+            )
+        return "—"
+    thumb.short_description = "Превью"
+
+    # -------- Список --------
     list_display = (
-        "title_ru",
+        "title_ru",          # ← ОБЯЗАТЕЛЬНО есть в list_display
         "category_ru",
         "colored_difficulty",
         "cook_time_min",
         "is_published",
         "tag_list",
+        "thumb",
         "created_at_ru",
     )
+
+    # Кликабельная колонка(и) — ДОЛЖНА быть в list_display
     list_display_links = ("title_ru",)
-    list_editable = ("cook_time_min", "is_published")
 
     # Поиск / фильтры / сортировка
     ordering = ("-created_at",)
     search_fields = ("title", "desc", "slug")
-    list_filter = ("is_published", "difficulty", "category", "tags", CookingTimeFilter, "created_at")
+    list_filter = (
+        "is_published",
+        "difficulty",
+        "category",
+        "tags",
+        CookingTimeFilter,
+        "created_at",
+    )
 
     # Поля формы (группы)
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at", "thumb")
     fieldsets = (
         ("Основное", {
             "fields": (
                 ("title", "slug"),
                 "desc",
-                ("image", "cook_time", "cook_time_min"),
+                ("image", "photo"),
+                ("cook_time", "cook_time_min"),
                 ("difficulty", "is_published"),
             )
         }),
         ("Связи", {"fields": ("category", "tags")}),
         ("Служебное", {
-            "fields": (("created_at", "updated_at"),),
+            "fields": (("created_at", "updated_at", "thumb"),),
             "classes": ("collapse",),
         }),
     )
 
+    # Действия
     actions = [make_published, make_unpublished, add_fast_tag]
 
 
@@ -170,7 +199,8 @@ class RecipeAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     empty_value_display = "—"
 
-    def recipe_count(self, obj): return obj.recipes.count()
+    def recipe_count(self, obj):
+        return obj.recipes.count()
     recipe_count.short_description = "Рецептов"
 
     list_display = ("name", "slug", "recipe_count")
@@ -184,7 +214,8 @@ class CategoryAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     empty_value_display = "—"
 
-    def recipe_count(self, obj): return obj.recipes.count()
+    def recipe_count(self, obj):
+        return obj.recipes.count()
     recipe_count.short_description = "Рецептов"
 
     list_display = ("name", "slug", "recipe_count")
