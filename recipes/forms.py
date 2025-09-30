@@ -83,13 +83,9 @@ class RecipeModelForm(forms.ModelForm):
     """Шаг 2: форма, связанная с моделью Recipe (без загрузки файлов — это шаг 3)."""
     class Meta:
         model = Recipe
-        fields = [
-            'title', 'slug', 'desc',
-            'cook_time', 'cook_time_min',
-            'difficulty', 'is_published',
-            'category', 'tags',
-            # photo добавим на шаге 3
-        ]
+        fields = ['title','slug','desc','cook_time','cook_time_min',
+          'difficulty','is_published','category','tags','photo']
+
         labels = {
             'title': 'Название',
             'slug': 'Слаг (латиница)',
@@ -100,6 +96,8 @@ class RecipeModelForm(forms.ModelForm):
             'is_published': 'Опубликован',
             'category': 'Категория',
             'tags': 'Теги',
+            'photo': 'Фото',
+
         }
         help_texts = {
             'slug': 'Только латинские буквы, цифры и дефисы. Должен быть уникальным.',

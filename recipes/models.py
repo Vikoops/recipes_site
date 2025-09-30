@@ -1,6 +1,11 @@
 from django.db import models
 from django.urls import reverse
+import os, uuid
 
+def recipe_photo_upload_to(instance, filename):
+    # имя типа recipes/<uuid>.ext
+    ext = os.path.splitext(filename)[1].lower()
+    return f"recipes/{uuid.uuid4().hex}{ext}"
 
 class PublishedManager(models.Manager):
     """Менеджер, показывающий только опубликованные рецепты."""
@@ -60,6 +65,7 @@ class Recipe(models.Model):
         default=Difficulty.EASY,
     )
     is_published = models.BooleanField("Опубликован", default=True)
+    photo = models.ImageField("Фото", upload_to=recipe_photo_upload_to, blank=True, null=True)
 
     # Связи
     category = models.ForeignKey(
@@ -116,3 +122,4 @@ class RecipeInfo(models.Model):
 
     def __str__(self) -> str:
         return f"Info for {self.recipe.title}"
+

@@ -28,7 +28,8 @@
     </div>
   {% endif %}
 
-  <form method="post" novalidate class="form-card">
+  <form method="post" enctype="multipart/form-data" novalidate class="form-card">
+
     {% csrf_token %}
 
     <div class="form-grid form-grid--spaced">
@@ -76,6 +77,13 @@
         {{ form.tags }}
         {{ form.tags.errors }}
       </div>
+
+      <div class="form-field">
+  <label class="form-label" for="{{ form.photo.id_for_label }}">Фото</label>
+  {{ form.photo }}
+  {{ form.photo.errors }}
+</div>
+
 
       <div class="form-field full">
         <label class="form-label" for="{{ form.desc.id_for_label }}">Описание</label>

@@ -130,7 +130,7 @@ def add_recipe_model(request):
     Сейчас БЕЗ поля загрузки файла (его подключим на шаге 3).
     """
     if request.method == "POST":
-        form = RecipeModelForm(request.POST)
+        form = RecipeModelForm(request.POST, request.FILES)
         if form.is_valid():
             recipe = form.save()  # сохранится в БД
             messages.success(request, "Рецепт добавлен (ModelForm).")
