@@ -228,3 +228,5 @@ class TagAdmin(admin.ModelAdmin):
 admin.site.site_header = "Рецепты — админ-панель"
 admin.site.site_title = "Рецепты | Admin"
 admin.site.index_title = "Управление сайтом рецептов"
+
+

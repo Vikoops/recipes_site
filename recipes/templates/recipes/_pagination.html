@@ -1,0 +1,33 @@
+
+{% if is_paginated %}
+  {% with page=page_obj number=page_obj.number total=paginator.num_pages %}
+  <nav class="pagination" aria-label="Навигация по страницам">
+    <ul class="pager">
+      {# НАЗАД #}
+      {% if page.has_previous %}
+        <li><a class="pager-link pager-prev" href="?page={{ page.previous_page_number }}{{ query_tail }}" aria-label="Предыдущая">‹</a></li>
+      {% endif %}
+
+      {# окно номеров: по 2 слева/справа от текущей, плюс крайние при необходимости #}
+      {% for i in paginator.page_range %}
+        {% if i == number %}
+          <li><span class="pager-current" aria-current="page">{{ i }}</span></li>
+        {% elif i >= number|add:-2 and i <= number|add:2 %}
+          <li><a class="pager-link" href="?page={{ i }}{{ query_tail }}">{{ i }}</a></li>
+        {% elif i == 1 and number > 3 %}
+          <li><a class="pager-link" href="?page=1{{ query_tail }}">1</a></li>
+          <li><span class="pager-ellipsis">…</span></li>
+        {% elif i == total and number < total|add:-2 %}
+          <li><span class="pager-ellipsis">…</span></li>
+          <li><a class="pager-link" href="?page={{ total }}{{ query_tail }}">{{ total }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {# ВПЕРЁД #}
+      {% if page.has_next %}
+        <li><a class="pager-link pager-next" href="?page={{ page.next_page_number }}{{ query_tail }}" aria-label="Следующая">›</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endwith %}
+{% endif %}

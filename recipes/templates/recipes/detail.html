@@ -5,25 +5,35 @@
 {% block content %}
   <article class="recipe-detail">
     {% if recipe.photo %}
-  <img class="detail-img" src="{{ recipe.photo.url }}" alt="{{ recipe.title }}">
-{% elif recipe.image %}
-  <img class="detail-img" src="{% static recipe.image %}" alt="{{ recipe.title }}">
-{% endif %}
+      <img class="detail-img" src="{{ recipe.photo.url }}" alt="{{ recipe.title }}">
+    {% elif recipe.image %}
+      <img class="detail-img" src="{% static recipe.image %}" alt="{{ recipe.title }}">
+    {% endif %}
 
     <h1>{{ recipe.title }}</h1>
-    {% if recipe.category %}
-  <p class="meta">Категория: <a href="{{ recipe.category.get_absolute_url }}">{{ recipe.category.name }}</a></p>
-{% endif %}
 
-{% if recipe.tags.all %}
-  <ul class="tags">
-    {% for t in recipe.tags.all %}
-      <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    {% if recipe.category %}
+      <p class="meta">Категория:
+        <a href="{{ recipe.category.get_absolute_url }}">{{ recipe.category.name }}</a>
+      </p>
+    {% endif %}
+
+    {% if recipe.tags.all %}
+      <ul class="tags">
+        {% for t in recipe.tags.all %}
+          <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
 
     <p class="meta">⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}</p>
     <p class="lead">{{ recipe.desc }}</p>
+
+    <!-- КНОПКИ РЕДАКТИРОВАНИЯ/УДАЛЕНИЯ — добавлено -->
+    <p style="margin-top:16px">
+      <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
+      <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
+    </p>
+    <!-- /добавлено -->
   </article>
 {% endblock %}

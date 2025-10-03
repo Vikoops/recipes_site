@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="form-wrap">
+  <div class="form-head">
+    <h1 class="page-title" style="margin-bottom:4px">{{ title }}</h1>
+    <div class="form-sub">Обновите поля рецепта и сохраните изменения.</div>
+  </div>
+
+  {% if messages %}
+    <ul class="msgs">
+      {% for m in messages %}
+        <li class="{{ m.tags|default:'' }}">{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="form-errors">
+      <ul class="errorlist">
+        {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate class="form-card">
+    {% csrf_token %}
+    <div class="form-grid form-grid--spaced">
+      {# — выведем поля так же, как в add_model.html — #}
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.title.id_for_label }}">Название</label>
+        {{ form.title }} {{ form.title.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.slug.id_for_label }}">Слаг (латиница)</label>
+        {{ form.slug }} {{ form.slug.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.difficulty.id_for_label }}">Сложность</label>
+        {{ form.difficulty }} {{ form.difficulty.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.cook_time_min.id_for_label }}">Время (мин)</label>
+        {{ form.cook_time_min }} {{ form.cook_time_min.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.cook_time.id_for_label }}">Время (текст)</label>
+        {{ form.cook_time }} {{ form.cook_time.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.category.id_for_label }}">Категория</label>
+        {{ form.category }} {{ form.category.errors }}
+      </div>
+
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.tags.id_for_label }}">Теги</label>
+        {{ form.tags }} {{ form.tags.errors }}
+      </div>
+
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.photo.id_for_label }}">Фото</label>
+        {{ form.photo }} {{ form.photo.errors }}
+      </div>
+
+      <div class="form-field full">
+        <label class="form-label" for="{{ form.desc.id_for_label }}">Описание</label>
+        {{ form.desc }} {{ form.desc.errors }}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.is_published.id_for_label }}">Опубликован</label>
+        {{ form.is_published }} {{ form.is_published.errors }}
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ object.get_absolute_url }}" class="btn ghost">Отмена</a>
+      <button class="btn primary" type="submit">Сохранить</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
