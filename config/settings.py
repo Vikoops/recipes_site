@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'recipes.apps.RecipesConfig',
     'django_extensions',
+    'users.apps.UsersConfig',
     
 ]
 
