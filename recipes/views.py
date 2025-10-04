@@ -10,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     TemplateView, DetailView, ListView, FormView, CreateView, UpdateView, DeleteView
 )
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
@@ -273,11 +274,13 @@ class SuggestRecipeView(DataMixin, FormView):
         messages.error(self.request, "Проверьте поля — есть ошибки.")
         return super().form_invalid(form)
 
-class RecipeCreateView(DataMixin, CreateView):
+class RecipeCreateView(LoginRequiredMixin, DataMixin, CreateView):
     model = Recipe
     form_class = RecipeModelForm
     template_name = 'recipes/add_model.html'
     title_page = 'Добавить рецепт'
+    login_url = 'users:login'
+    redirect_field_name = 'next'
 
     def form_valid(self, form):
         resp = super().form_valid(form)
@@ -291,13 +294,15 @@ class RecipeCreateView(DataMixin, CreateView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-class RecipeUpdateView(DataMixin, UpdateView):
+class RecipeUpdateView(LoginRequiredMixin, DataMixin, UpdateView):
     model = Recipe
     form_class = RecipeModelForm
     template_name = 'recipes/edit_model.html'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     title_page = 'Редактировать рецепт'
+    #login_url = 'users:login'
+    #redirect_field_name = 'next'
 
     def form_valid(self, form):
         resp = super().form_valid(form)
@@ -311,13 +316,15 @@ class RecipeUpdateView(DataMixin, UpdateView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-class RecipeDeleteView(DataMixin, DeleteView):
+class RecipeDeleteView(LoginRequiredMixin, DataMixin, DeleteView):
     model = Recipe
     template_name = 'recipes/confirm_delete.html'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     success_url = reverse_lazy('home')
     title_page = 'Удалить рецепт'
+    #login_url = 'users:login'
+    #redirect_field_name = 'next'
 
     def delete(self, request, *args, **kwargs):
         messages.warning(self.request, "Рецепт удалён.")

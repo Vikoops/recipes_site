@@ -131,3 +131,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# куда слать неавторизованного
+LOGIN_URL = 'users:login'
+# куда слать ПОСЛЕ логина, если параметра ?next= нет
+LOGIN_REDIRECT_URL = 'home'
+# куда слать после logout (можно оставить None — тогда покажет страницу подтверждения)
+LOGOUT_REDIRECT_URL = 'home'

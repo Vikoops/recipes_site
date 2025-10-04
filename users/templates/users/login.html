@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+  <div class="form-wrap">
+    <div class="form-head">
+      <h1 class="page-title">Войти</h1>
+      <div class="form-sub">Введите логин и пароль. После входа вы вернётесь на нужную страницу.</div>
+    </div>
+
+    {% if form.errors %}
+      <div class="form-errors">
+        <ul class="errorlist">{% for field, errs in form.errors.items %}
+          {% for e in errs %}<li>{{ e }}</li>{% endfor %}{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" class="form-card">
+      {% csrf_token %}
+      {# если нас прислали со страницы /add/ — сюда попадёт next #}
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% endif %}
+
+      <div class="form-grid form-grid--spaced">
+        <div class="form-field">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Логин</label>
+          {{ form.username }}
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="{{ form.password.id_for_label }}">Пароль</label>
+          {{ form.password }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'home' %}" class="btn ghost">Отмена</a>
+        <button class="btn primary" type="submit">Войти</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}
