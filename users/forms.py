@@ -1,0 +1,43 @@
+# users/forms.py
+from django import forms
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+
+class EmailAuthenticationForm(forms.Form):
+    email = forms.EmailField(
+        label="E-mail",
+        widget=forms.EmailInput(attrs={"class": "form-input", "placeholder": "you@example.com"})
+    )
+    password = forms.CharField(
+        label="Пароль",
+        widget=forms.PasswordInput(attrs={"class": "form-input", "placeholder": "Пароль"})
+    )
+
+    error_messages = {
+        "invalid_login": "Неверный e-mail или пароль.",
+        "inactive": "Учетная запись отключена.",
+        "not_unique": "В системе найдено несколько пользователей с этим e-mail. Обратитесь к администратору.",
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        # LoginView передает сюда request — сохраняем, дальше используем в authenticate()
+        self.request = request
+        super().__init__(*args, **kwargs)
+        self.user_cache = None
+
+    def clean(self):
+        cleaned = super().clean()
+        email = cleaned.get("email")
+        password = cleaned.get("password")
+        if email and password:
+            # наш бекенд принимает email как username
+            user = authenticate(self.request, username=email, password=password)
+            if user is None:
+                raise ValidationError(self.error_messages["invalid_login"])
+            if not user.is_active:
+                raise ValidationError(self.error_messages["inactive"])
+            self.user_cache = user
+        return cleaned
+
+    def get_user(self):
+        return self.user_cache

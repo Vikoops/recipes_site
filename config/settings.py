@@ -138,3 +138,9 @@ LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'home'
 # куда слать после logout (можно оставить None — тогда покажет страницу подтверждения)
 LOGOUT_REDIRECT_URL = 'home'
+
+
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailAuthBackend',              # наш e-mail бекенд
+    'django.contrib.auth.backends.ModelBackend',    # стандартный (оставляем для админки и прочего)
+]
