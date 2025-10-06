@@ -144,3 +144,12 @@ AUTHENTICATION_BACKENDS = [
     'users.backends.EmailAuthBackend',              # наш e-mail бекенд
     'django.contrib.auth.backends.ModelBackend',    # стандартный (оставляем для админки и прочего)
 ]
+
+
+DEFAULT_FROM_EMAIL = 'zachinyaeva.viktoriya@gmail.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'zachinyaeva.viktoriya@gmail.com'
+EMAIL_HOST_PASSWORD = 'vqrw kchc eebi zlzf'  
