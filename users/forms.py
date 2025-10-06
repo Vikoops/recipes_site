@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import PasswordChangeForm
 
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(
@@ -41,3 +42,16 @@ class EmailAuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+
+class PasswordChangeNoRepeatForm(PasswordChangeForm):
+    """Запрет смены пароля на тот же самый."""
+    def clean_new_password2(self):
+        new_password2 = super().clean_new_password2()
+        old_password = self.cleaned_data.get("old_password")
+        user = self.user  # устанавливается базовым PasswordChangeForm
+
+        # если новый пароль совпадает со старым — запретим
+        if old_password and user.check_password(new_password2):
+            raise ValidationError("Новый пароль не должен совпадать с текущим.")
+        return new_password2
