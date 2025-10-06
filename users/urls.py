@@ -9,7 +9,8 @@ from django.contrib.auth.views import (
 )
 
 from .forms import EmailAuthenticationForm
-from .views import ProfileView, UserPasswordChangeView
+from .views import ProfileView, UserPasswordChangeView, RegisterView
+
 
 app_name = 'users'
 
@@ -63,4 +64,6 @@ urlpatterns = [
         ),
         name='password_reset_complete'
     ),
+
+    path('register/', RegisterView.as_view(), name='register'),
 ]

@@ -15,31 +15,34 @@
       </div>
     {% endif %}
 
-    <form method="post" class="form-card" novalidate>
-      {% csrf_token %}
-      {% if request.GET.next %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}">
-      {% endif %}
+  <form method="post" class="form-card" novalidate>
+    {% csrf_token %}
+    {% if request.GET.next %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
 
-      <div class="form-grid form-grid--spaced">
-        <div class="form-field">
-          <label class="form-label" for="{{ form.email.id_for_label }}">E-mail</label>
-          {{ form.email }} {{ form.email.errors }}
-        </div>
-
-        <div class="form-field">
-          <label class="form-label" for="{{ form.password.id_for_label }}">Пароль</label>
-          {{ form.password }} {{ form.password.errors }}
-        </div>
+    <div class="form-grid form-grid--spaced">
+      <div class="form-field">
+        <label class="form-label" for="{{ form.email.id_for_label }}">E-mail</label>
+        {{ form.email }} {{ form.email.errors }}
       </div>
-
-      <div class="form-actions">
-        <a href="{% url 'home' %}" class="btn ghost">Отмена</a>
-        <button class="btn primary" type="submit">Войти</button>
+      <div class="form-field">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Пароль</label>
+        {{ form.password }} {{ form.password.errors }}
       </div>
-      <div style="margin-top:8px">
-  <a href="{% url 'users:password_reset' %}">Забыли пароль?</a>
-</div>
-    </form>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'home' %}" class="btn ghost">Отмена</a>
+      <button class="btn primary" type="submit">Войти</button>
+    </div>
+
+    <div class="auth-links">
+      <a href="{% url 'users:password_reset' %}">Забыли пароль?</a>
+      <span>·</span>
+      <a href="{% url 'users:register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">Нет аккаунта? Зарегистрируйтесь</a>
+    </div>
+  </form>
+
   </div>
 {% endblock %}

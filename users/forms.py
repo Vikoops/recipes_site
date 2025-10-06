@@ -3,6 +3,10 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(
@@ -55,3 +59,21 @@ class PasswordChangeNoRepeatForm(PasswordChangeForm):
         if old_password and user.check_password(new_password2):
             raise ValidationError("Новый пароль не должен совпадать с текущим.")
         return new_password2
+    
+
+class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(
+        label="E-mail",
+        required=True,
+        widget=forms.EmailInput(attrs={"class": "form-input", "placeholder": "you@example.com"})
+    )
+
+    class Meta:
+        model = User
+        fields = ("username", "email",)
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError("Пользователь с таким e-mail уже зарегистрирован.")
+        return email

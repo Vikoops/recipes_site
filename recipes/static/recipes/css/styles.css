@@ -290,3 +290,89 @@ body{
 
 /* небольшой запас снизу, чтобы футер не наезжал */
 .pagination{ margin-bottom: 16px; }
+
+
+/* === Auth & Forms polish === */
+.form-wrap{
+  max-width: 820px; margin: 24px auto 32px;
+  padding: 0 16px;
+}
+.form-head{ margin-bottom: 12px; }
+.form-sub{ color:#856b52; margin-top:4px; }
+
+.form-card{
+  background:#fff; border:1px solid #e8dccf;
+  border-radius:18px; padding:18px;
+  box-shadow: 0 8px 30px rgba(117, 77, 36, .08);
+}
+
+.form-grid{ display:grid; gap:12px; }
+.form-grid--spaced{ grid-template-columns: 1fr 1fr; }
+@media (max-width: 700px){
+  .form-grid--spaced{ grid-template-columns: 1fr; }
+}
+
+.form-field{ display:flex; flex-direction:column; gap:6px; }
+.form-label{ font-weight:700; color:var(--choco, #6d3a04); }
+
+.form-input,
+.form-card input[type="text"],
+.form-card input[type="email"],
+.form-card input[type="password"],
+.form-card textarea,
+.form-card select{
+  width:100%;
+  border:1px solid #e3d6c9;
+  background:#eef3ff1f; /* очень светлый */
+  border-radius:12px; padding:12px 14px; line-height:1.25;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  outline: none;
+}
+
+.form-card textarea{ min-height:130px; resize:vertical; }
+
+.form-card input:focus,
+.form-card textarea:focus,
+.form-card select:focus{
+  border-color: var(--choco, #6d3a04);
+  box-shadow: 0 0 0 3px rgba(131, 79, 21, .15);
+  background: #fff;
+}
+
+.form-actions{
+  margin-top: 14px;
+  display:flex; gap:10px; justify-content:flex-end; align-items:center;
+  flex-wrap:wrap;
+}
+
+/* Кнопки (перекрас под бренд, чуть крупнее) */
+.btn{ font-weight:700; border-radius:12px; padding:10px 16px; }
+.btn.primary{
+  background: var(--choco, #6d3a04); color:#fff; border:1px solid var(--choco, #6d3a04);
+}
+.btn.primary:hover{ filter:brightness(1.05); }
+.btn.ghost{
+  background:#fff; color:var(--choco, #6d3a04);
+  border:1px solid #cfb79f;
+}
+.btn.ghost:hover{ background:#f5eee7; }
+
+/* Сообщения и ошибки */
+.msgs{ list-style:none; padding:0; margin:0 0 10px 0; }
+.msgs li{ padding:10px 12px; border-radius:12px; margin-bottom:8px; font-weight:600; }
+.msgs li.success{ background:#e6f6eb; color:#20643a; border:1px solid #c6e9d1; }
+.msgs li.error{ background:#fdeaea; color:#8c2a2a; border:1px solid #f2c9c9; }
+
+.form-errors{ margin:10px 0; }
+.form-errors .errorlist{ margin:0; padding:10px 12px; background:#fdeaea; color:#8c2a2a;
+  border:1px solid #f2c9c9; border-radius:12px; list-style: none;
+}
+.errorlist{ color:#8c2a2a; margin:4px 0 0 0; padding-left:0; list-style:none; font-size: 14px; }
+
+/* Ссылки под формой */
+.auth-links{
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  margin-top:8px;
+}
+.auth-links a{ color:#6d3a04; text-decoration: underline; text-underline-offset:2px; }
+.auth-links a:hover{ text-decoration-thickness: 2px; }
