@@ -10,7 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     TemplateView, DetailView, ListView, FormView, CreateView, UpdateView, DeleteView
 )
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 
@@ -294,7 +294,9 @@ class RecipeCreateView(LoginRequiredMixin, DataMixin, CreateView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-class RecipeUpdateView(LoginRequiredMixin, DataMixin, UpdateView):
+class RecipeUpdateView(LoginRequiredMixin, DataMixin, UpdateView, PermissionRequiredMixin):
+    permission_required = 'recipes.change_recipe'
+    raise_exception = True
     model = Recipe
     form_class = RecipeModelForm
     template_name = 'recipes/edit_model.html'
@@ -316,7 +318,9 @@ class RecipeUpdateView(LoginRequiredMixin, DataMixin, UpdateView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-class RecipeDeleteView(LoginRequiredMixin, DataMixin, DeleteView):
+class RecipeDeleteView(LoginRequiredMixin, DataMixin, DeleteView, PermissionRequiredMixin):
+    permission_required = 'recipes.delete_recipe'
+    raise_exception = True
     model = Recipe
     template_name = 'recipes/confirm_delete.html'
     slug_field = 'slug'

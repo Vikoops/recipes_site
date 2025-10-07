@@ -31,9 +31,14 @@
 
     <!-- КНОПКИ РЕДАКТИРОВАНИЯ/УДАЛЕНИЯ — добавлено -->
     <p style="margin-top:16px">
-      <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
-      <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
-    </p>
+  {% if perms.recipes.change_recipe %}
+    <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
+  {% endif %}
+  {% if perms.recipes.delete_recipe %}
+    <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
+  {% endif %}
+</p>
+
     <!-- /добавлено -->
   </article>
 {% endblock %}
