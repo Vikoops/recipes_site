@@ -34,8 +34,18 @@
   {% if perms.recipes.change_recipe %}
     <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
   {% endif %}
+
   {% if perms.recipes.delete_recipe %}
     <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
+  {% endif %}
+
+  {% if perms.recipes.can_publish %}
+    <form action="{% url 'recipe_publish_toggle' recipe.slug %}" method="post" style="display:inline">
+      {% csrf_token %}
+      <button class="btn" type="submit">
+        {% if recipe.is_published %}Снять с публикации{% else %}Опубликовать{% endif %}
+      </button>
+    </form>
   {% endif %}
 </p>
 

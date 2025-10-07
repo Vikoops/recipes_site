@@ -97,6 +97,9 @@ class Recipe(models.Model):
         verbose_name_plural = "Рецепты"
         ordering = ["-created_at"]
         indexes = [models.Index(fields=["-created_at"])]
+        permissions = [
+            ('can_publish', 'Может публиковать рецепты'),
+        ]
 
     def __str__(self) -> str:
         return self.title

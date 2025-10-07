@@ -11,6 +11,7 @@ from django.views.generic import (
     TemplateView, DetailView, ListView, FormView, CreateView, UpdateView, DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views import View
 
 
 
@@ -215,8 +216,15 @@ class RecipeDetailView(DataMixin, DetailView):
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     # показываем только опубликованные:
-    queryset = Recipe.published.all()
-
+    def get_queryset(self):
+        # по умолчанию — только опубликованные
+        qs = Recipe.published.all()
+        # если есть право публиковать — видно всё
+        user = getattr(self.request, "user", None)
+        if user and user.has_perm('recipes.can_publish'):
+            qs = Recipe.objects.all()
+        return qs
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         # заголовок = название рецепта
@@ -333,3 +341,17 @@ class RecipeDeleteView(LoginRequiredMixin, DataMixin, DeleteView, PermissionRequ
     def delete(self, request, *args, **kwargs):
         messages.warning(self.request, "Рецепт удалён.")
         return super().delete(request, *args, **kwargs)
+
+class RecipePublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'recipes.can_publish'
+    raise_exception = True  # без прав вернёт 403, а не редирект на логин
+
+    def post(self, request, slug):
+        recipe = get_object_or_404(Recipe, slug=slug)
+        recipe.is_published = not recipe.is_published
+        recipe.save(update_fields=['is_published'])
+        messages.success(
+            request,
+            "Рецепт опубликован." if recipe.is_published else "Рецепт снят с публикации."
+        )
+        return redirect(recipe.get_absolute_url())
