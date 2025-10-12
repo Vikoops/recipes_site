@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from .models import Recipe, Category, Tag, RecipeInfo
-
+from .models import Comment
 
 # ---------- ДЕЙСТВИЯ (Actions) ----------
 @admin.action(description="Опубликовать выбранные рецепты")
@@ -224,6 +224,16 @@ class TagAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("name",)
 
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'author', 'short_body', 'is_active', 'created_at')
+    list_filter = ('is_active', 'created_at', 'recipe', 'author')
+    search_fields = ('body', 'recipe__title', 'author__username', 'author__first_name', 'author__last_name')
+    ordering = ('-created_at',)
+
+    def short_body(self, obj):
+        return (obj.body[:60] + '…') if len(obj.body) > 60 else obj.body
+    short_body.short_description = 'Комментарий'
 
 # ---------- БРЕНДИНГ ----------
 admin.site.site_header = "Рецепты — админ-панель"

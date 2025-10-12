@@ -13,7 +13,8 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views import View
 from django.urls import NoReverseMatch
-
+from .forms import CommentForm
+from .models import Comment
 
 
 MENU = [
@@ -244,9 +245,19 @@ class RecipeDetailView(DataMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # заголовок = название рецепта
         self.title_page = self.object.title
         ctx['year'] = 2025
+
+        # Комментарии (активные)
+        comments_qs = self.object.comments.select_related('author').filter(is_active=True)
+        ctx['comments'] = comments_qs
+
+        # Форма: только для аутентифицированных
+        if self.request.user.is_authenticated:
+            ctx['comment_form'] = CommentForm()
+        else:
+            ctx['comment_form'] = None
+
         return self.get_mixin_context(ctx)
 
 class RecipesByCategoryView(DataMixin, ListView):
@@ -402,3 +413,26 @@ class CategoriesListView(DataMixin, ListView):
         ctx = super().get_context_data(**kwargs)
         ctx['year'] = 2025
         return self.get_mixin_context(ctx)
+    
+
+class CommentCreateView(LoginRequiredMixin, DataMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'recipes/comment_form.html'  # можно не создавать, тк мы форму рендерим на detail
+    # но CreateView требует template_name; он не будет показан при успешной отправке
+
+    def form_valid(self, form):
+        recipe = get_object_or_404(Recipe, slug=self.kwargs['slug'])
+        obj = form.save(commit=False)
+        obj.recipe = recipe
+        obj.author = self.request.user
+        obj.save()
+        messages.success(self.request, "Комментарий добавлен.")
+        # редиректим на рецепт, к блоку комментариев
+        return redirect(f"{recipe.get_absolute_url()}#comments")
+
+    def form_invalid(self, form):
+        # Если вдруг вызовут напрямую — вернёмся на рецепт с сообщением
+        messages.error(self.request, "Исправьте ошибки в комментарии.")
+        recipe = get_object_or_404(Recipe, slug=self.kwargs['slug'])
+        return redirect(f"{recipe.get_absolute_url()}#comments")

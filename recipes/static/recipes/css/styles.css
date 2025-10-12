@@ -376,3 +376,16 @@ body{
 }
 .auth-links a{ color:#6d3a04; text-decoration: underline; text-underline-offset:2px; }
 .auth-links a:hover{ text-decoration-thickness: 2px; }
+
+.sep { margin: 20px 0; border: none; border-top: 1px solid #eadfd3; }
+
+.comments h2 { margin: 8px 0 12px; }
+.comment-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.comment { background: #fff; border: 1px solid #eadfd3; border-radius: 12px; padding: 10px 12px; }
+.comment-meta { font-size: 14px; color: #6a5948; display: flex; gap: 12px; align-items: baseline; }
+.comment-date { opacity: .8; }
+.comment-body { margin-top: 6px; color: #3b2a1a; }
+
+.comment-form textarea { width: 100%; border: 1px solid #e3d6c9; border-radius: 10px; padding: 10px 12px; }
+.comment-form .form-errors { color: #8c2a2a; font-size: 13px; margin: 6px 0 0; }
+.comment-form .btn { margin-top: 8px; }

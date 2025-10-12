@@ -4,7 +4,7 @@ from .views import (
     IndexView, AboutView, RecipeDetailView,
     RecipesByCategoryView, RecipesByTagView,
     SuggestRecipeView, RecipeCreateView, RecipeUpdateView, RecipeDeleteView,
-    RecipePublishView, CategoriesListView,
+    RecipePublishView, CategoriesListView, CommentCreateView,
 )
 
 urlpatterns = [
@@ -28,6 +28,8 @@ urlpatterns = [
     path('recipe/<slug:slug>/edit/', RecipeUpdateView.as_view(), name='recipe_edit'),
     path('recipe/<slug:slug>/delete/', RecipeDeleteView.as_view(), name='recipe_delete'),
     path('recipe/<slug:slug>/publish-toggle/', RecipePublishView.as_view(), name='recipe_publish_toggle'),
+
+    path('recipe/<slug:slug>/comment/', CommentCreateView.as_view(), name='comment_add'),
 
     # СПИСКИ ПО ФИЛЬТРАМ
     path('category/<slug:slug>/', RecipesByCategoryView.as_view(), name='recipes_by_category'),

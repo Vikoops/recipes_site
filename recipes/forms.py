@@ -1,5 +1,6 @@
 from django import forms
 from .models import Recipe, Category, Tag
+from .models import Comment
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 
@@ -133,3 +134,17 @@ class RecipeModelForm(forms.ModelForm):
         # но рекомендуем всё же заполнить минуты для статистики/фильтрации
         return cleaned
 
+class CommentForm(forms.ModelForm):
+    body = forms.CharField(
+        label='Комментарий',
+        widget=forms.Textarea(attrs={'rows': 4, 'placeholder': 'Напишите что-нибудь полезное…'}),
+        min_length=5,
+        error_messages={
+            'required': 'Комментарий не может быть пустым.',
+            'min_length': 'Комментарий слишком короткий (минимум 5 символов).',
+        }
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('body',)  # recipe/author выставим во вью

@@ -136,3 +136,28 @@ class RecipeInfo(models.Model):
     def __str__(self) -> str:
         return f"Info for {self.recipe.title}"
 
+
+class Comment(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Рецепт'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='recipe_comments',
+        verbose_name='Автор'
+    )
+    body = models.TextField('Текст комментария')
+    is_active = models.BooleanField('Показывать', default=True)
+
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+    updated_at = models.DateTimeField('Изменён', auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Комментарий к "{self.recipe.title}" от {self.author}'
