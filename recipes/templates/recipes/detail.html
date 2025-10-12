@@ -26,19 +26,18 @@
       </ul>
     {% endif %}
 
-    <p class="meta">⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}</p>
-    <p class="lead">{{ recipe.desc }}</p>
+    <p class="meta">
+  ⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}
+  {% if recipe.author %} · 👤 Автор: {{ recipe.author.get_full_name|default:recipe.author.username }}{% endif %}
+</p>
 
-    <!-- КНОПКИ РЕДАКТИРОВАНИЯ/УДАЛЕНИЯ — добавлено -->
-    <p style="margin-top:16px">
-  {% if perms.recipes.change_recipe %}
+<p style="margin-top:16px">
+  {% if request.user == recipe.author or perms.recipes.change_recipe %}
     <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
   {% endif %}
-
-  {% if perms.recipes.delete_recipe %}
+  {% if request.user == recipe.author or perms.recipes.delete_recipe %}
     <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
   {% endif %}
-
   {% if perms.recipes.can_publish %}
     <form action="{% url 'recipe_publish_toggle' recipe.slug %}" method="post" style="display:inline">
       {% csrf_token %}
@@ -48,6 +47,7 @@
     </form>
   {% endif %}
 </p>
+
 
     <!-- /добавлено -->
   </article>

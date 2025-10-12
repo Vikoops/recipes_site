@@ -27,6 +27,7 @@
               <li>⏱ {{ r.cook_time }}</li>
               <li>🥣 Сложность: {{ r.get_difficulty_display }}</li>
             </ul>
+                      <ul class = "meta">👤 {{ r.author.get_full_name|default:r.author.username }} </ul>
             <p><a class="btn" href="{{ r.get_absolute_url }}">Читать рецепт</a></p>
           </div>
         </li>

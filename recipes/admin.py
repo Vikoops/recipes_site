@@ -148,6 +148,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         "title_ru",          # ← ОБЯЗАТЕЛЬНО есть в list_display
         "category_ru",
+        "author",
         "colored_difficulty",
         "cook_time_min",
         "is_published",

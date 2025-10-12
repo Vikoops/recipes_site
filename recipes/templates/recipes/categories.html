@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Категории — Рецепты{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Категории</h1>
+
+  {% if categories %}
+    <ul class="tag-cloud">
+      {% for c in categories %}
+        <li class="tag-cloud__item">
+          <a class="tag" href="{{ c.get_absolute_url }}">
+            {{ c.name }}
+            <span class="tag-count">{{ c.recipes_count|default:0 }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Категории пока не добавлены.</p>
+  {% endif %}
+{% endblock %}

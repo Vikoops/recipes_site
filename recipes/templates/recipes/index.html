@@ -43,6 +43,7 @@
             <li>⏱ {{ r.cook_time }}</li>
             <li>🥣 Сложность: {{ r.get_difficulty_display }}</li>
           </ul>
+          <ul class = "meta">👤 {{ r.author.get_full_name|default:r.author.username }} </ul>
           <ul class="tags">
             {% for t in r.tags.all %}
                 <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>
@@ -50,7 +51,8 @@
                 <li class="tag tag-empty">без тегов</li>
             {% endfor %}
             </ul>
-          <p><a class="btn" href="{{ r.get_absolute_url }}">Читать рецепт</a></p>
+          <p>
+            <a class="btn" href="{{ r.get_absolute_url }}">Читать рецепт</a></p>
         </div>
       </li>
     {% endfor %}

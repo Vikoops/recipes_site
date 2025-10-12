@@ -84,7 +84,7 @@ class RecipeModelForm(forms.ModelForm):
     class Meta:
         model = Recipe
         fields = ['title','slug','desc','cook_time','cook_time_min',
-          'difficulty','is_published','category','tags','photo']
+          'difficulty','is_published','category','tags','photo', 'image']
 
         labels = {
             'title': 'Название',

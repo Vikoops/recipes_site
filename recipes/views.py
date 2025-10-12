@@ -12,6 +12,7 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views import View
+from django.urls import NoReverseMatch
 
 
 
@@ -196,7 +197,23 @@ class IndexView(DataMixin, ListView):
         if diff: tail_parts.append(f"difficulty={diff}")
         if sort_by and sort_by != '-created_at': tail_parts.append(f"sort={sort_by}")
         ctx['query_tail'] = ('&' + '&'.join(tail_parts)) if tail_parts else ''
+                # безопасно определяем URL на добавление рецепта (учтём разные имена маршрутов)
+        add_url = None
+        try:
+            add_url = reverse('recipes:recipe_add')  # если используешь namespace
+        except NoReverseMatch:
+            try:
+                add_url = reverse('recipe_add')      # без namespace
+            except NoReverseMatch:
+                try:
+                    add_url = reverse('add_recipe_model')  # старое FBV имя, если осталось
+                except NoReverseMatch:
+                    add_url = None
+
+        ctx['add_recipe_url'] = add_url
         return self.get_mixin_context(ctx)
+
+        
 
 
 
@@ -291,10 +308,12 @@ class RecipeCreateView(LoginRequiredMixin, DataMixin, CreateView):
     redirect_field_name = 'next'
 
     def form_valid(self, form):
-        resp = super().form_valid(form)
+        obj = form.save(commit=False)
+        obj.author = self.request.user  # ВАЖНО: автор — текущий пользователь
+        obj.save()
+        form.save_m2m()
         messages.success(self.request, "Рецепт добавлен.")
-        return resp
-
+        return redirect(obj.get_absolute_url())
     def form_invalid(self, form):
         messages.error(self.request, "Исправьте ошибки формы.")
         return super().form_invalid(form)
@@ -311,8 +330,15 @@ class RecipeUpdateView(LoginRequiredMixin, DataMixin, UpdateView, PermissionRequ
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     title_page = 'Редактировать рецепт'
-    #login_url = 'users:login'
-    #redirect_field_name = 'next'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        # суперпользователь или обладатель права — может всё
+        if user.is_superuser or user.has_perm('recipes.change_recipe'):
+            return qs
+        # иначе — только свои
+        return qs.filter(author=user)
 
     def form_valid(self, form):
         resp = super().form_valid(form)
@@ -335,8 +361,13 @@ class RecipeDeleteView(LoginRequiredMixin, DataMixin, DeleteView, PermissionRequ
     slug_url_kwarg = 'slug'
     success_url = reverse_lazy('home')
     title_page = 'Удалить рецепт'
-    #login_url = 'users:login'
-    #redirect_field_name = 'next'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.is_superuser or user.has_perm('recipes.delete_recipe'):
+            return qs
+        return qs.filter(author=user)
 
     def delete(self, request, *args, **kwargs):
         messages.warning(self.request, "Рецепт удалён.")
@@ -355,3 +386,19 @@ class RecipePublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "Рецепт опубликован." if recipe.is_published else "Рецепт снят с публикации."
         )
         return redirect(recipe.get_absolute_url())
+    
+
+class CategoriesListView(DataMixin, ListView):
+    model = Category
+    template_name = 'recipes/categories.html'
+    context_object_name = 'categories'
+    title_page = 'Категории'
+
+    def get_queryset(self):
+        # отдаем список категорий + количество рецептов в каждой
+        return Category.objects.annotate(recipes_count=Count('recipes')).order_by('name')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['year'] = 2025
+        return self.get_mixin_context(ctx)

@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 import os, uuid
+from django.conf import settings
+
 
 def recipe_photo_upload_to(instance, filename):
     # имя типа recipes/<uuid>.ext
@@ -51,6 +53,14 @@ class Recipe(models.Model):
         EASY = "easy", "простая"
         MEDIUM = "medium", "средняя"
         HARD = "hard", "сложная"
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='recipes',
+        null=True, blank=True,  # временно: потом при желании сделаем обязательным
+        verbose_name='Автор'
+    )
 
     title = models.CharField("Название", max_length=255, db_index=True)
     slug = models.SlugField("Слаг", max_length=255, unique=True, db_index=True)
