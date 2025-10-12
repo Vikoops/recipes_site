@@ -389,3 +389,11 @@ body{
 .comment-form textarea { width: 100%; border: 1px solid #e3d6c9; border-radius: 10px; padding: 10px 12px; }
 .comment-form .form-errors { color: #8c2a2a; font-size: 13px; margin: 6px 0 0; }
 .comment-form .btn { margin-top: 8px; }
+
+.reactions h3 { margin: 8px 0 10px; color:#3b2814; }
+.reactions-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+.reaction-pill { background:#fff; border:1px solid #eadfd3; border-radius:999px; padding:6px 10px; color:#3b2a1a; }
+.reaction-pill .count { font-weight:700; margin-left:4px; }
+.reactions-actions .btn { margin-right:8px; }
+
+.btn.active { filter: brightness(0.92); box-shadow: 0 0 0 3px rgba(122,66,11,.14); }

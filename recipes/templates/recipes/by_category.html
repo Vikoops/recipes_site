@@ -24,6 +24,7 @@
             <li>🥣 {{ r.get_difficulty_display }}</li>
           </ul>
                     <ul class = "meta">👤 {{ r.author.get_full_name|default:r.author.username }} </ul>
+                    <ul class = "meta">👍 {{ r.likes|default:0 }}  👎 {{ r.dislikes|default:0 }} </ul>
           <ul class="tags">
             {% for t in r.tags.all %}
               <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>

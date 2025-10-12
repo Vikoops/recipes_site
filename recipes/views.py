@@ -15,7 +15,9 @@ from django.views import View
 from django.urls import NoReverseMatch
 from .forms import CommentForm
 from .models import Comment
-
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
+from .models import Reaction
 
 MENU = [
     {'title': 'Главная', 'url_name': 'home'},
@@ -164,11 +166,18 @@ class IndexView(DataMixin, ListView):
 
     # формируем список с учётом GET-параметров (как делали во FBV)
     def get_queryset(self):
-        sort_by = self.request.GET.get('sort', '-created_at')  # '-created_at' | 'title' | '-title'
+        sort_by = self.request.GET.get('sort', '-created_at')
         q = self.request.GET.get('q', '').strip()
-        diff = self.request.GET.get('difficulty', '')  # 'easy'|'medium'|'hard'|''
+        diff = self.request.GET.get('difficulty', '')
 
-        qs = Recipe.published.all()
+        qs = (Recipe.published
+              .all()
+              .annotate(
+                  likes=Count('reactions', filter=Q(reactions__kind='like')),
+                  dislikes=Count('reactions', filter=Q(reactions__kind='dislike')),
+              )
+              .select_related('category')  # быстрее
+              .prefetch_related('tags'))
 
         if q:
             qs = qs.filter(Q(title__icontains=q) | Q(desc__icontains=q))
@@ -258,6 +267,12 @@ class RecipeDetailView(DataMixin, DetailView):
         else:
             ctx['comment_form'] = None
 
+        user_reaction = None
+        if self.request.user.is_authenticated:
+            user_reaction = self.object.reactions.filter(user=self.request.user).values_list('kind', flat=True).first()
+        ctx['user_reaction'] = user_reaction
+
+
         return self.get_mixin_context(ctx)
 
 class RecipesByCategoryView(DataMixin, ListView):
@@ -268,7 +283,15 @@ class RecipesByCategoryView(DataMixin, ListView):
     title_page = 'Рецепты по категории'
 
     def get_queryset(self):
-        return Recipe.published.filter(category__slug=self.kwargs['slug']).select_related('category').prefetch_related('tags')
+        return (Recipe.published
+                .filter(category__slug=self.kwargs['slug'])
+                .annotate(
+                    likes=Count('reactions', filter=Q(reactions__kind='like')),
+                    dislikes=Count('reactions', filter=Q(reactions__kind='dislike')),
+                )
+                .select_related('category')
+                .prefetch_related('tags'))
+
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -286,7 +309,16 @@ class RecipesByTagView(DataMixin, ListView):
     title_page = 'Рецепты по тегу'
 
     def get_queryset(self):
-        return Recipe.published.filter(tags__slug=self.kwargs['slug']).prefetch_related('tags','category')
+        return (Recipe.published
+                .filter(tags__slug=self.kwargs['slug'])
+                .annotate(
+                    likes=Count('reactions', filter=Q(reactions__kind='like')),
+                    dislikes=Count('reactions', filter=Q(reactions__kind='dislike')),
+                )
+                .prefetch_related('tags','category'))
+
+
+       
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -436,3 +468,37 @@ class CommentCreateView(LoginRequiredMixin, DataMixin, CreateView):
         messages.error(self.request, "Исправьте ошибки в комментарии.")
         recipe = get_object_or_404(Recipe, slug=self.kwargs['slug'])
         return redirect(f"{recipe.get_absolute_url()}#comments")
+
+
+@method_decorator(require_POST, name='dispatch')
+class ReactionToggleView(LoginRequiredMixin, View):
+    """
+    POST /recipe/<slug>/react/  с полем kind = like | dislike
+    Меняет/снимает ТОЛЬКО реакцию текущего пользователя.
+    """
+    def post(self, request, slug):
+        recipe = get_object_or_404(Recipe, slug=slug)
+        kind = request.POST.get('kind')
+        if kind not in ('like', 'dislike'):
+            messages.error(request, "Некорректный тип реакции.")
+            return redirect(f"{recipe.get_absolute_url()}#reactions")
+
+        # реакция текущего пользователя (и только его)
+        react = Reaction.objects.filter(recipe=recipe, user=request.user).first()
+
+        if react is None:
+            # не было — создаём с выбранным видом
+            Reaction.objects.create(recipe=recipe, user=request.user, kind=kind)
+            messages.success(request, "Готово!")
+        else:
+            if react.kind == kind:
+                # повторный клик по тому же виду — снимаем реакцию ЭТОГО пользователя
+                react.delete()
+                messages.info(request, "Реакция снята.")
+            else:
+                # меняем вид реакции ЭТОГО пользователя
+                react.kind = kind
+                react.save(update_fields=['kind'])
+                messages.success(request, "Обновлено!")
+
+        return redirect(f"{recipe.get_absolute_url()}#reactions")

@@ -5,6 +5,8 @@ from django.utils.safestring import mark_safe
 
 from .models import Recipe, Category, Tag, RecipeInfo
 from .models import Comment
+from .models import Reaction
+
 
 # ---------- ДЕЙСТВИЯ (Actions) ----------
 @admin.action(description="Опубликовать выбранные рецепты")
@@ -234,6 +236,13 @@ class CommentAdmin(admin.ModelAdmin):
     def short_body(self, obj):
         return (obj.body[:60] + '…') if len(obj.body) > 60 else obj.body
     short_body.short_description = 'Комментарий'
+
+@admin.register(Reaction)
+class ReactionAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'user', 'kind', 'created_at')
+    list_filter = ('kind', 'created_at')
+    search_fields = ('recipe__title', 'user__username', 'user__first_name', 'user__last_name')
+    ordering = ('-created_at',)
 
 # ---------- БРЕНДИНГ ----------
 admin.site.site_header = "Рецепты — админ-панель"

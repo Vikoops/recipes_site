@@ -4,8 +4,9 @@ from .views import (
     IndexView, AboutView, RecipeDetailView,
     RecipesByCategoryView, RecipesByTagView,
     SuggestRecipeView, RecipeCreateView, RecipeUpdateView, RecipeDeleteView,
-    RecipePublishView, CategoriesListView, CommentCreateView,
+    RecipePublishView, CategoriesListView, CommentCreateView, ReactionToggleView,
 )
+
 
 urlpatterns = [
     path('', IndexView.as_view(), name='home'),
@@ -30,7 +31,7 @@ urlpatterns = [
     path('recipe/<slug:slug>/publish-toggle/', RecipePublishView.as_view(), name='recipe_publish_toggle'),
 
     path('recipe/<slug:slug>/comment/', CommentCreateView.as_view(), name='comment_add'),
-
+    path('recipe/<slug:slug>/react/', ReactionToggleView.as_view(), name='recipe_react'),
     # СПИСКИ ПО ФИЛЬТРАМ
     path('category/<slug:slug>/', RecipesByCategoryView.as_view(), name='recipes_by_category'),
     path('tag/<slug:slug>/', RecipesByTagView.as_view(), name='recipes_by_tag'),

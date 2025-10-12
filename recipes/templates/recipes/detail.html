@@ -50,6 +50,44 @@
   </article>
   <hr class="sep">
 
+<hr class="sep">
+
+<section id="reactions" class="reactions">
+  <h3>Оцените рецепт</h3>
+
+  <div class="reactions-row">
+    <div class="reaction-pill">
+      👍 <span class="count">{{ recipe.likes_count }}</span>
+    </div>
+    <div class="reaction-pill">
+      👎 <span class="count">{{ recipe.dislikes_count }}</span>
+    </div>
+  </div>
+
+  {% if request.user.is_authenticated %}
+    <div class="reactions-actions">
+      <form action="{% url 'recipe_react' recipe.slug %}" method="post" style="display:inline">
+        {% csrf_token %}
+        <input type="hidden" name="kind" value="like">
+        <!-- ВОТ ЗДЕСЬ: -->
+        <button type="submit" class="btn {% if user_reaction == 'like' %}active{% endif %}">Лайк</button>
+      </form>
+
+      <form action="{% url 'recipe_react' recipe.slug %}" method="post" style="display:inline">
+        {% csrf_token %}
+        <input type="hidden" name="kind" value="dislike">
+        <!-- И ЗДЕСЬ: -->
+        <button type="submit" class="btn ghost {% if user_reaction == 'dislike' %}active{% endif %}">Дизлайк</button>
+      </form>
+    </div>
+  {% else %}
+    <p>
+      <a class="btn" href="{% url 'users:login' %}?next={{ request.path }}#reactions">Войдите</a>, чтобы поставить лайк или дизлайк.
+    </p>
+  {% endif %}
+</section>
+
+
 <section id="comments" class="comments">
   <h2>Комментарии ({{ comments|length }})</h2>
 

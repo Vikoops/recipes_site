@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 import os, uuid
 from django.conf import settings
-
+from django.db.models import Count, Q
 
 def recipe_photo_upload_to(instance, filename):
     # имя типа recipes/<uuid>.ext
@@ -117,6 +117,11 @@ class Recipe(models.Model):
     def get_absolute_url(self):
         return reverse("recipe_detail_slug", kwargs={"slug": self.slug})
 
+    def likes_count(self):
+        return self.reactions.filter(kind='like').count()
+
+    def dislikes_count(self):
+        return self.reactions.filter(kind='dislike').count()
 
 class RecipeInfo(models.Model):
     """Доп.информация про рецепт (1 <-> 1)."""
@@ -161,3 +166,32 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Комментарий к "{self.recipe.title}" от {self.author}'
+
+# recipes/models.py
+from django.db import models
+
+class Reaction(models.Model):
+    class Kind(models.TextChoices):
+        LIKE = 'like', 'Лайк'
+        DISLIKE = 'dislike', 'Дизлайк'
+
+    recipe = models.ForeignKey('Recipe', on_delete=models.CASCADE, related_name='reactions', verbose_name='Рецепт')
+    user   = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='recipe_reactions', verbose_name='Пользователь')
+    kind   = models.CharField(max_length=7, choices=Kind.choices, verbose_name='Реакция')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # УБИРАЕМ unique_together, если он был
+        # unique_together = (('recipe', 'user'),)
+
+        constraints = [
+            models.UniqueConstraint(fields=['recipe', 'user'], name='uniq_reaction_recipe_user'),
+        ]
+        indexes = [
+            models.Index(fields=['recipe', 'kind']),
+        ]
+        verbose_name = 'Реакция'
+        verbose_name_plural = 'Реакции'
+
+    def __str__(self):
+        return f'{self.user} -> {self.recipe} ({self.kind})'

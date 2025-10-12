@@ -28,6 +28,7 @@
               <li>🥣 Сложность: {{ r.get_difficulty_display }}</li>
             </ul>
                       <ul class = "meta">👤 {{ r.author.get_full_name|default:r.author.username }} </ul>
+                      <ul class = "meta">👍 {{ r.likes|default:0 }}  👎 {{ r.dislikes|default:0 }} </ul>
             <p><a class="btn" href="{{ r.get_absolute_url }}">Читать рецепт</a></p>
           </div>
         </li>
