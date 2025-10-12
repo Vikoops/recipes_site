@@ -163,6 +163,9 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        permissions = [
+            ('can_moderate_comments', 'Может модерировать комментарии'),
+        ]
 
     def __str__(self):
         return f'Комментарий к "{self.recipe.title}" от {self.author}'

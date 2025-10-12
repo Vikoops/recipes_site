@@ -5,6 +5,7 @@ from .views import (
     RecipesByCategoryView, RecipesByTagView,
     SuggestRecipeView, RecipeCreateView, RecipeUpdateView, RecipeDeleteView,
     RecipePublishView, CategoriesListView, CommentCreateView, ReactionToggleView,
+    CommentDeleteView, 
 )
 
 
@@ -19,6 +20,8 @@ urlpatterns = [
 
     # формы/действия
     path('suggest/', SuggestRecipeView.as_view(), name='suggest_recipe'),
+
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 
     # >>> СОЗДАНИЕ РЕЦЕПТА ДОЛЖНО БЫТЬ ВЫШЕ СЛАГА <<<
     path('recipe/add/', RecipeCreateView.as_view(), name='recipe_add'),

@@ -2,66 +2,74 @@
 {% load static %}
 
 {% block title %}{{ title }} — Рецепты{% endblock %}
+
 {% block content %}
-  <article class="recipe-detail">
-    {% if recipe.photo %}
-      <img class="detail-img" src="{{ recipe.photo.url }}" alt="{{ recipe.title }}">
-    {% elif recipe.image %}
-      <img class="detail-img" src="{% static recipe.image %}" alt="{{ recipe.title }}">
-    {% endif %}
+<article class="recipe-detail">
+  {% if recipe.photo %}
+    <img class="detail-img" src="{{ recipe.photo.url }}" alt="{{ recipe.title }}">
+  {% elif recipe.image %}
+    <img class="detail-img" src="{% static recipe.image %}" alt="{{ recipe.title }}">
+  {% endif %}
 
-    <h1>{{ recipe.title }}</h1>
+  <h1>{{ recipe.title }}</h1>
 
-    {% if recipe.category %}
-      <p class="meta">Категория:
-        <a href="{{ recipe.category.get_absolute_url }}">{{ recipe.category.name }}</a>
-      </p>
-    {% endif %}
-
-    {% if recipe.tags.all %}
-      <ul class="tags">
-        {% for t in recipe.tags.all %}
-          <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-
+  {% if recipe.category %}
     <p class="meta">
-  ⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}
-  {% if recipe.author %} · 👤 Автор: {{ recipe.author.get_full_name|default:recipe.author.username }}{% endif %}
-</p>
+      Категория:
+      <a href="{{ recipe.category.get_absolute_url }}">{{ recipe.category.name }}</a>
+    </p>
+  {% endif %}
 
-<p style="margin-top:16px">
-  {% if request.user == recipe.author or perms.recipes.change_recipe %}
-    <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
+  {% if recipe.tags.all %}
+    <ul class="tags">
+      {% for t in recipe.tags.all %}
+        <li><a class="tag" href="{{ t.get_absolute_url }}">{{ t.name }}</a></li>
+      {% endfor %}
+    </ul>
   {% endif %}
-  {% if request.user == recipe.author or perms.recipes.delete_recipe %}
-    <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
-  {% endif %}
-  {% if perms.recipes.can_publish %}
-    <form action="{% url 'recipe_publish_toggle' recipe.slug %}" method="post" style="display:inline">
-      {% csrf_token %}
-      <button class="btn" type="submit">
-        {% if recipe.is_published %}Снять с публикации{% else %}Опубликовать{% endif %}
-      </button>
-    </form>
-  {% endif %}
-</p>
-  </article>
-  <hr class="sep">
+
+  <p class="meta">
+    ⏱ {{ recipe.cook_time }} · 🥣 {{ recipe.get_difficulty_display }}
+    {% if recipe.author %} · 👤 Автор: {{ recipe.author.get_full_name|default:recipe.author.username }}{% endif %}
+  </p>
+
+  <p class="action-row" style="margin-top:16px">
+    {# действия видны только авторизованным #}
+    {% if request.user.is_authenticated %}
+
+      {# Редактирование — автор рецепта ИЛИ право change_recipe #}
+      {% if request.user.pk == recipe.author_id or perms.recipes.change_recipe %}
+        <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
+      {% endif %}
+
+      {# Удаление — автор рецепта ИЛИ право delete_recipe #}
+      {% if request.user.pk == recipe.author_id or perms.recipes.delete_recipe %}
+        <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
+      {% endif %}
+
+    {% endif %}
+
+    {# Публикация — у кого есть право can_publish #}
+    {% if perms.recipes.can_publish %}
+      <form action="{% url 'recipe_publish_toggle' recipe.slug %}" method="post" style="display:inline">
+        {% csrf_token %}
+        <button class="btn" type="submit">
+          {% if recipe.is_published %}Снять с публикации{% else %}Опубликовать{% endif %}
+        </button>
+      </form>
+    {% endif %}
+  </p>
+</article>
 
 <hr class="sep">
 
+{# -------------------- Лайки / Дизлайки -------------------- #}
 <section id="reactions" class="reactions">
   <h3>Оцените рецепт</h3>
 
   <div class="reactions-row">
-    <div class="reaction-pill">
-      👍 <span class="count">{{ recipe.likes_count }}</span>
-    </div>
-    <div class="reaction-pill">
-      👎 <span class="count">{{ recipe.dislikes_count }}</span>
-    </div>
+    <div class="reaction-pill">👍 <span class="count">{{ recipe.likes_count }}</span></div>
+    <div class="reaction-pill">👎 <span class="count">{{ recipe.dislikes_count }}</span></div>
   </div>
 
   {% if request.user.is_authenticated %}
@@ -69,14 +77,12 @@
       <form action="{% url 'recipe_react' recipe.slug %}" method="post" style="display:inline">
         {% csrf_token %}
         <input type="hidden" name="kind" value="like">
-        <!-- ВОТ ЗДЕСЬ: -->
         <button type="submit" class="btn {% if user_reaction == 'like' %}active{% endif %}">Лайк</button>
       </form>
 
       <form action="{% url 'recipe_react' recipe.slug %}" method="post" style="display:inline">
         {% csrf_token %}
         <input type="hidden" name="kind" value="dislike">
-        <!-- И ЗДЕСЬ: -->
         <button type="submit" class="btn ghost {% if user_reaction == 'dislike' %}active{% endif %}">Дизлайк</button>
       </form>
     </div>
@@ -87,7 +93,9 @@
   {% endif %}
 </section>
 
+<hr class="sep">
 
+{# -------------------- Комментарии -------------------- #}
 <section id="comments" class="comments">
   <h2>Комментарии ({{ comments|length }})</h2>
 
@@ -98,7 +106,18 @@
           <div class="comment-meta">
             <b>{{ c.author.get_full_name|default:c.author.username }}</b>
             <span class="comment-date">{{ c.created_at|date:"d.m.Y H:i" }}</span>
+
+            {# Автор комментария ИЛИ модератор (can_moderate_comments) может удалить #}
+            {% if request.user.is_authenticated %}
+              {% if request.user.pk == c.author_id or perms.recipes.can_moderate_comments %}
+                <form action="{% url 'comment_delete' c.pk %}" method="post" style="margin-left:auto">
+                  {% csrf_token %}
+                  <button type="submit" class="btn ghost small">Удалить</button>
+                </form>
+              {% endif %}
+            {% endif %}
           </div>
+
           <div class="comment-body">
             {{ c.body|linebreaksbr }}
           </div>
@@ -125,5 +144,4 @@
     </p>
   {% endif %}
 </section>
-
 {% endblock %}

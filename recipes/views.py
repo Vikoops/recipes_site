@@ -10,7 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     TemplateView, DetailView, ListView, FormView, CreateView, UpdateView, DeleteView
 )
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.views import View
 from django.urls import NoReverseMatch
 from .forms import CommentForm
@@ -18,6 +18,8 @@ from .models import Comment
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from .models import Reaction
+
+
 
 MENU = [
     {'title': 'Главная', 'url_name': 'home'},
@@ -244,13 +246,12 @@ class RecipeDetailView(DataMixin, DetailView):
     slug_url_kwarg = 'slug'
     # показываем только опубликованные:
     def get_queryset(self):
-        # по умолчанию — только опубликованные
         qs = Recipe.published.all()
-        # если есть право публиковать — видно всё
         user = getattr(self.request, "user", None)
-        if user and user.has_perm('recipes.can_publish'):
-            qs = Recipe.objects.all()
+        if user and user.is_authenticated:
+            qs = Recipe.objects.filter(models.Q(is_published=True) | models.Q(author=user))
         return qs
+
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -289,8 +290,12 @@ class RecipesByCategoryView(DataMixin, ListView):
                     likes=Count('reactions', filter=Q(reactions__kind='like')),
                     dislikes=Count('reactions', filter=Q(reactions__kind='dislike')),
                 )
+                .order_by('-created_at') 
                 .select_related('category')
-                .prefetch_related('tags'))
+                .prefetch_related('tags')
+                
+                )
+    
 
 
     def get_context_data(self, **kwargs):
@@ -314,8 +319,10 @@ class RecipesByTagView(DataMixin, ListView):
                 .annotate(
                     likes=Count('reactions', filter=Q(reactions__kind='like')),
                     dislikes=Count('reactions', filter=Q(reactions__kind='dislike')),
+                ).order_by('-created_at') 
+                .prefetch_related('tags','category')
+                
                 )
-                .prefetch_related('tags','category'))
 
 
        
@@ -377,10 +384,8 @@ class RecipeUpdateView(LoginRequiredMixin, DataMixin, UpdateView, PermissionRequ
     def get_queryset(self):
         qs = super().get_queryset()
         user = self.request.user
-        # суперпользователь или обладатель права — может всё
         if user.is_superuser or user.has_perm('recipes.change_recipe'):
             return qs
-        # иначе — только свои
         return qs.filter(author=user)
 
     def form_valid(self, form):
@@ -502,3 +507,22 @@ class ReactionToggleView(LoginRequiredMixin, View):
                 messages.success(request, "Обновлено!")
 
         return redirect(f"{recipe.get_absolute_url()}#reactions")
+    
+
+    
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """
+    Удалять комментарий может:
+      - автор комментария
+      - пользователь с правом recipes.can_moderate_comments
+    """
+    def test_func(self):
+        self.comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        u = self.request.user
+        return u.is_superuser or u.has_perm('recipes.can_moderate_comments') or (self.comment.author_id == u.id)
+
+    def post(self, request, *args, **kwargs):
+        recipe = self.comment.recipe
+        self.comment.delete()
+        messages.warning(request, "Комментарий удалён.")
+        return redirect(f"{recipe.get_absolute_url()}#comments")
