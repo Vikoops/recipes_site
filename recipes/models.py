@@ -170,9 +170,6 @@ class Comment(models.Model):
     def __str__(self):
         return f'Комментарий к "{self.recipe.title}" от {self.author}'
 
-# recipes/models.py
-from django.db import models
-
 class Reaction(models.Model):
     class Kind(models.TextChoices):
         LIKE = 'like', 'Лайк'
@@ -184,9 +181,6 @@ class Reaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        # УБИРАЕМ unique_together, если он был
-        # unique_together = (('recipe', 'user'),)
-
         constraints = [
             models.UniqueConstraint(fields=['recipe', 'user'], name='uniq_reaction_recipe_user'),
         ]
