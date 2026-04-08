@@ -8,7 +8,6 @@ from .models import Comment
 from .models import Reaction
 
 
-# ---------- ДЕЙСТВИЯ (Actions) ----------
 @admin.action(description="Опубликовать выбранные рецепты")
 def make_published(modeladmin, request, queryset):
     updated = queryset.update(is_published=True)
@@ -33,7 +32,6 @@ def add_fast_tag(modeladmin, request, queryset):
     )
 
 
-# ---------- СОБСТВЕННЫЙ ФИЛЬТР ----------
 class CookingTimeFilter(admin.SimpleListFilter):
     title = "время готовки"
     parameter_name = "cook_len"
@@ -56,7 +54,6 @@ class CookingTimeFilter(admin.SimpleListFilter):
         return qs
 
 
-# ---------- INLINE ДЛЯ OneToOne ----------
 class RecipeInfoInline(admin.StackedInline):
     model = RecipeInfo
     can_delete = True
@@ -64,7 +61,6 @@ class RecipeInfoInline(admin.StackedInline):
     max_num = 1
 
 
-# ---------- ФОРМА (подписи/виджеты) ----------
 class RecipeAdminForm(forms.ModelForm):
     class Meta:
         model = Recipe
@@ -89,7 +85,6 @@ class RecipeAdminForm(forms.ModelForm):
         }
 
 
-# ---------- РЕЦЕПТЫ ----------
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     form = RecipeAdminForm
@@ -100,7 +95,6 @@ class RecipeAdmin(admin.ModelAdmin):
     inlines = [RecipeInfoInline]
     empty_value_display = "—"
 
-    # «Русские» колонки/заголовки
     def title_ru(self, obj):
         return obj.title
     title_ru.short_description = "Название"
@@ -136,7 +130,6 @@ class RecipeAdmin(admin.ModelAdmin):
     colored_difficulty.short_description = "Сложность"
     colored_difficulty.admin_order_field = "difficulty"
 
-    # миниатюра загруженного фото
     def thumb(self, obj):
         if getattr(obj, "photo", None):
             return mark_safe(
@@ -146,9 +139,8 @@ class RecipeAdmin(admin.ModelAdmin):
         return "—"
     thumb.short_description = "Превью"
 
-    # -------- Список --------
     list_display = (
-        "title_ru",          # ← ОБЯЗАТЕЛЬНО есть в list_display
+        "title_ru",      
         "category_ru",
         "author",
         "colored_difficulty",
@@ -159,10 +151,8 @@ class RecipeAdmin(admin.ModelAdmin):
         "created_at_ru",
     )
 
-    # Кликабельная колонка(и) — ДОЛЖНА быть в list_display
     list_display_links = ("title_ru",)
 
-    # Поиск / фильтры / сортировка
     ordering = ("-created_at",)
     search_fields = ("title", "desc", "slug")
     list_filter = (
@@ -174,7 +164,6 @@ class RecipeAdmin(admin.ModelAdmin):
         "created_at",
     )
 
-    # Поля формы (группы)
     readonly_fields = ("created_at", "updated_at", "thumb")
     fieldsets = (
         ("Основное", {
@@ -193,11 +182,9 @@ class RecipeAdmin(admin.ModelAdmin):
         }),
     )
 
-    # Действия
     actions = [make_published, make_unpublished, add_fast_tag]
 
 
-# ---------- КАТЕГОРИИ ----------
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     empty_value_display = "—"
@@ -212,7 +199,6 @@ class CategoryAdmin(admin.ModelAdmin):
     ordering = ("name",)
 
 
-# ---------- ТЕГИ ----------
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     empty_value_display = "—"
@@ -244,7 +230,6 @@ class ReactionAdmin(admin.ModelAdmin):
     search_fields = ('recipe__title', 'user__username', 'user__first_name', 'user__last_name')
     ordering = ('-created_at',)
 
-# ---------- БРЕНДИНГ ----------
 admin.site.site_header = "Рецепты — админ-панель"
 admin.site.site_title = "Рецепты | Admin"
 admin.site.index_title = "Управление сайтом рецептов"

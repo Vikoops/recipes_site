@@ -6,7 +6,7 @@
 {% block content %}
   <h1 class="page-title">Предложить рецепт</h1>
 
-  {# глобальные сообщения (messages.success / error) #}
+
   {% if messages %}
     <ul class="form-error">
       {% for m in messages %}
@@ -15,7 +15,7 @@
     </ul>
   {% endif %}
 
-  {# НЕпривязанные к полю ошибки (из clean) #}
+  
   {% if form.non_field_errors %}
     <div class="form-error">{{ form.non_field_errors }}</div>
   {% endif %}
@@ -62,7 +62,7 @@
     </p>
   </form>
 
-  {# покажем, что именно прошло валидацию #}
+  
   {% if cleaned %}
     <hr>
     <h3>Данные прошли проверку!</h3>

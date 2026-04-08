@@ -1,4 +1,4 @@
-# users/forms.py
+
 from django import forms
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
@@ -25,7 +25,7 @@ class EmailAuthenticationForm(forms.Form):
     }
 
     def __init__(self, request=None, *args, **kwargs):
-        # LoginView передает сюда request — сохраняем, дальше используем в authenticate()
+
         self.request = request
         super().__init__(*args, **kwargs)
         self.user_cache = None
@@ -35,7 +35,7 @@ class EmailAuthenticationForm(forms.Form):
         email = cleaned.get("email")
         password = cleaned.get("password")
         if email and password:
-            # наш бекенд принимает email как username
+
             user = authenticate(self.request, username=email, password=password)
             if user is None:
                 raise ValidationError(self.error_messages["invalid_login"])
@@ -49,13 +49,11 @@ class EmailAuthenticationForm(forms.Form):
 
 
 class PasswordChangeNoRepeatForm(PasswordChangeForm):
-    """Запрет смены пароля на тот же самый."""
     def clean_new_password2(self):
         new_password2 = super().clean_new_password2()
         old_password = self.cleaned_data.get("old_password")
-        user = self.user  # устанавливается базовым PasswordChangeForm
+        user = self.user  
 
-        # если новый пароль совпадает со старым — запретим
         if old_password and user.check_password(new_password2):
             raise ValidationError("Новый пароль не должен совпадать с текущим.")
         return new_password2

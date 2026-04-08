@@ -27,7 +27,7 @@
   <form method="post" enctype="multipart/form-data" novalidate class="form-card">
     {% csrf_token %}
     <div class="form-grid form-grid--spaced">
-      {# — выведем поля так же, как в add_model.html — #}
+      
       <div class="form-field full">
         <label class="form-label" for="{{ form.title.id_for_label }}">Название</label>
         {{ form.title }} {{ form.title.errors }}

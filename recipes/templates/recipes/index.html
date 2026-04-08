@@ -4,7 +4,7 @@
 {% block title %}Главная — Рецепты{% endblock %}
 {% block content %}
 
-  <!-- ФОРМА ПОИСКА/ФИЛЬТРОВ/СОРТИРОВКИ -->
+  
   <form method="get" class="filters">
     <input type="text" name="q" placeholder="Поиск..." value="{{ q }}">
     <select name="difficulty">
@@ -21,7 +21,7 @@
     <button class="btn">Применить</button>
   </form>
 
-  <!-- Список карточек -->
+
   <h1 class="page-title">{{ title }}</h1>
   <ul class="card-list">
     {% for r in recipes %}

@@ -20,15 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-89w!20g^2i6%o6*$27p15t0blnzlsdh)(mr01_y1dza@s193=1'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,7 +57,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / 'templates' ],    # <-- ОБЯЗАТЕЛЬНО
+        'DIRS': [ BASE_DIR / 'templates' ], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,17 +130,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# куда слать неавторизованного
 LOGIN_URL = 'users:login'
-# куда слать ПОСЛЕ логина, если параметра ?next= нет
 LOGIN_REDIRECT_URL = 'home'
-# куда слать после logout (можно оставить None — тогда покажет страницу подтверждения)
 LOGOUT_REDIRECT_URL = 'home'
 
 
 AUTHENTICATION_BACKENDS = [
-    'users.backends.EmailAuthBackend',              # наш e-mail бекенд
-    'django.contrib.auth.backends.ModelBackend',    # стандартный (оставляем для админки и прочего)
+    'users.backends.EmailAuthBackend',      
+    'django.contrib.auth.backends.ModelBackend', 
 ]
 
 

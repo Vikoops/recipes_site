@@ -27,11 +27,11 @@ MENU = [
 ]
 
 def index(request):
-    sort_by = request.GET.get('sort', '-created_at')  # '-created_at' | 'title' | '-title'
+    sort_by = request.GET.get('sort', '-created_at') 
     q = request.GET.get('q', '').strip()
-    diff = request.GET.get('difficulty', '')  # 'easy'|'medium'|'hard'|''
+    diff = request.GET.get('difficulty', '')  
 
-    recipes = Recipe.published.all()  # базово — только опубликованные
+    recipes = Recipe.published.all()  
 
     if q:
         recipes = recipes.filter(Q(title__icontains=q) | Q(desc__icontains=q))
@@ -49,8 +49,7 @@ def index(request):
     }
     return render(request, 'recipes/index.html', ctx)
 
-#def about(request):
-#    return render(request, 'recipes/about.html', {'title': 'О сайте', 'year': 2025})
+
 
 def recipe_detail_slug(request, slug):
     recipe = get_object_or_404(Recipe, slug=slug, is_published=True)
@@ -70,16 +69,12 @@ def recipes_by_tag(request, slug):
     return render(request, 'recipes/by_tag.html', ctx)
 
 def tag_list(request):
-    # список тегов с количеством рецептов (аннотация + группировка)
+
     tags = Tag.objects.annotate(recipe_count=Count('recipes')).order_by('-recipe_count', 'name')
     return render(request, 'recipes/tag_list.html', {'tags': tags, 'title': 'Теги', 'year': 2025})
 
 def stats(request):
-    """
-    Страница с примерами аннотаций/агрегаций/группировок.
-    Всё считается на стороне БД.
-    """
-    # 1) Сколько рецептов в каждой категории
+    
     per_category = (Category.objects
                     .annotate(cnt=Count('recipes'))
                     .values('name', 'cnt')
@@ -119,13 +114,11 @@ def stats(request):
     return render(request, 'recipes/stats.html', ctx)
 
 def suggest_recipe(request):
-    """
-    Страница «Предложить рецепт». На этом шаге просто валидируем форму и показываем результат.
-    """
+    
     if request.method == "POST":
         form = SuggestRecipeForm(request.POST)
         if form.is_valid():
-            # тут в Лабе 10 шаг 1 НИЧЕГО не сохраняем — просто показываем успех и выведем очищенные данные
+ 
             messages.success(request, "Спасибо! Форма валидна — данные приняты.")
             ctx = {"form": SuggestRecipeForm(), "cleaned": form.cleaned_data, "title": "Предложить рецепт", "year": 2025}
             return render(request, "recipes/suggest.html", ctx)
@@ -140,14 +133,11 @@ def suggest_recipe(request):
 
 
 def add_recipe_model(request):
-    """
-    Шаг 2: добавление рецепта через ModelForm.
-    Сейчас БЕЗ поля загрузки файла (его подключим на шаге 3).
-    """
+    
     if request.method == "POST":
         form = RecipeModelForm(request.POST, request.FILES)
         if form.is_valid():
-            recipe = form.save()  # сохранится в БД
+            recipe = form.save() 
             messages.success(request, "Рецепт добавлен (ModelForm).")
             return redirect(recipe.get_absolute_url())
         else:
@@ -158,15 +148,12 @@ def add_recipe_model(request):
     return render(request, "recipes/add_model.html", {"form": form, "title": "Добавить рецепт"})
 
 class IndexView(DataMixin, ListView):
-    """
-    Главная: список рецептов с поиском/фильтрами/сортировкой.
-    """
+    
     model = Recipe
     template_name = 'recipes/index.html'
     context_object_name = 'recipes'
-    title_page = 'Новые рецепты'  # попадёт в шаблон как {{ title }} через DataMixin
+    title_page = 'Новые рецепты'  
 
-    # формируем список с учётом GET-параметров (как делали во FBV)
     def get_queryset(self):
         sort_by = self.request.GET.get('sort', '-created_at')
         q = self.request.GET.get('q', '').strip()
@@ -178,7 +165,7 @@ class IndexView(DataMixin, ListView):
                   likes=Count('reactions', filter=Q(reactions__kind='like')),
                   dislikes=Count('reactions', filter=Q(reactions__kind='dislike')),
               )
-              .select_related('category')  # быстрее
+              .select_related('category')  
               .prefetch_related('tags'))
 
         if q:
@@ -188,7 +175,6 @@ class IndexView(DataMixin, ListView):
 
         return qs.order_by(sort_by)
 
-    # докидываем служебный контекст — выбранные фильтры, список сложностей и т.д.
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         q = self.request.GET.get('q', '').strip()
@@ -203,22 +189,20 @@ class IndexView(DataMixin, ListView):
             'year': 2025,
         })
 
-        # собрать query-параметры, КРОМЕ page
         tail_parts = []
         if q: tail_parts.append(f"q={q}")
         if diff: tail_parts.append(f"difficulty={diff}")
         if sort_by and sort_by != '-created_at': tail_parts.append(f"sort={sort_by}")
         ctx['query_tail'] = ('&' + '&'.join(tail_parts)) if tail_parts else ''
-                # безопасно определяем URL на добавление рецепта (учтём разные имена маршрутов)
         add_url = None
         try:
-            add_url = reverse('recipes:recipe_add')  # если используешь namespace
+            add_url = reverse('recipes:recipe_add') 
         except NoReverseMatch:
             try:
-                add_url = reverse('recipe_add')      # без namespace
+                add_url = reverse('recipe_add')     
             except NoReverseMatch:
                 try:
-                    add_url = reverse('add_recipe_model')  # старое FBV имя, если осталось
+                    add_url = reverse('add_recipe_model')
                 except NoReverseMatch:
                     add_url = None
 
@@ -244,7 +228,7 @@ class RecipeDetailView(DataMixin, DetailView):
     context_object_name = 'recipe'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
-    # показываем только опубликованные:
+    
     def get_queryset(self):
         qs = Recipe.published.all()
         user = getattr(self.request, "user", None)
@@ -258,11 +242,9 @@ class RecipeDetailView(DataMixin, DetailView):
         self.title_page = self.object.title
         ctx['year'] = 2025
 
-        # Комментарии (активные)
         comments_qs = self.object.comments.select_related('author').filter(is_active=True)
         ctx['comments'] = comments_qs
 
-        # Форма: только для аутентифицированных
         if self.request.user.is_authenticated:
             ctx['comment_form'] = CommentForm()
         else:
@@ -304,8 +286,6 @@ class RecipesByCategoryView(DataMixin, ListView):
         ctx['query_tail'] = ''
         return self.get_mixin_context(ctx, cat_selected=cat, current_category=cat, title=f'Категория: {cat.name if cat else ""}')
 
-        #return self.get_mixin_context(ctx, cat_selected=cat, current_category=cat, title=f'Категория: {cat.name if cat else ""}')
-
 class RecipesByTagView(DataMixin, ListView):
     model = Recipe
     template_name = 'recipes/by_tag.html'
@@ -333,8 +313,6 @@ class RecipesByTagView(DataMixin, ListView):
         ctx['query_tail'] = ''
         return self.get_mixin_context(ctx, current_tag=tag, title=f'Тег: {tag.name if tag else ""}')
 
-        #return self.get_mixin_context(ctx, current_tag=tag, title=f'Тег: {tag.name if tag else ""}')
-
 class SuggestRecipeView(DataMixin, FormView):
     template_name = 'recipes/suggest.html'
     form_class = SuggestRecipeForm
@@ -359,7 +337,7 @@ class RecipeCreateView(LoginRequiredMixin, DataMixin, CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=False)
-        obj.author = self.request.user  # ВАЖНО: автор — текущий пользователь
+        obj.author = self.request.user  
         obj.save()
         form.save_m2m()
         messages.success(self.request, "Рецепт добавлен.")
@@ -423,7 +401,7 @@ class RecipeDeleteView(LoginRequiredMixin, DataMixin, DeleteView, PermissionRequ
 
 class RecipePublishView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = 'recipes.can_publish'
-    raise_exception = True  # без прав вернёт 403, а не редирект на логин
+    raise_exception = True  
 
     def post(self, request, slug):
         recipe = get_object_or_404(Recipe, slug=slug)
@@ -443,7 +421,6 @@ class CategoriesListView(DataMixin, ListView):
     title_page = 'Категории'
 
     def get_queryset(self):
-        # отдаем список категорий + количество рецептов в каждой
         return Category.objects.annotate(recipes_count=Count('recipes')).order_by('name')
 
     def get_context_data(self, **kwargs):
@@ -455,9 +432,7 @@ class CategoriesListView(DataMixin, ListView):
 class CommentCreateView(LoginRequiredMixin, DataMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'recipes/comment_form.html'  # можно не создавать, тк мы форму рендерим на detail
-    # но CreateView требует template_name; он не будет показан при успешной отправке
-
+    template_name = 'recipes/comment_form.html'  
     def form_valid(self, form):
         recipe = get_object_or_404(Recipe, slug=self.kwargs['slug'])
         obj = form.save(commit=False)
@@ -465,11 +440,10 @@ class CommentCreateView(LoginRequiredMixin, DataMixin, CreateView):
         obj.author = self.request.user
         obj.save()
         messages.success(self.request, "Комментарий добавлен.")
-        # редиректим на рецепт, к блоку комментариев
+
         return redirect(f"{recipe.get_absolute_url()}#comments")
 
     def form_invalid(self, form):
-        # Если вдруг вызовут напрямую — вернёмся на рецепт с сообщением
         messages.error(self.request, "Исправьте ошибки в комментарии.")
         recipe = get_object_or_404(Recipe, slug=self.kwargs['slug'])
         return redirect(f"{recipe.get_absolute_url()}#comments")
@@ -477,10 +451,6 @@ class CommentCreateView(LoginRequiredMixin, DataMixin, CreateView):
 
 @method_decorator(require_POST, name='dispatch')
 class ReactionToggleView(LoginRequiredMixin, View):
-    """
-    POST /recipe/<slug>/react/  с полем kind = like | dislike
-    Меняет/снимает ТОЛЬКО реакцию текущего пользователя.
-    """
     def post(self, request, slug):
         recipe = get_object_or_404(Recipe, slug=slug)
         kind = request.POST.get('kind')
@@ -488,20 +458,16 @@ class ReactionToggleView(LoginRequiredMixin, View):
             messages.error(request, "Некорректный тип реакции.")
             return redirect(f"{recipe.get_absolute_url()}#reactions")
 
-        # реакция текущего пользователя (и только его)
         react = Reaction.objects.filter(recipe=recipe, user=request.user).first()
 
         if react is None:
-            # не было — создаём с выбранным видом
             Reaction.objects.create(recipe=recipe, user=request.user, kind=kind)
             messages.success(request, "Готово!")
         else:
             if react.kind == kind:
-                # повторный клик по тому же виду — снимаем реакцию ЭТОГО пользователя
                 react.delete()
                 messages.info(request, "Реакция снята.")
             else:
-                # меняем вид реакции ЭТОГО пользователя
                 react.kind = kind
                 react.save(update_fields=['kind'])
                 messages.success(request, "Обновлено!")
@@ -511,11 +477,7 @@ class ReactionToggleView(LoginRequiredMixin, View):
 
     
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
-    """
-    Удалять комментарий может:
-      - автор комментария
-      - пользователь с правом recipes.can_moderate_comments
-    """
+    
     def test_func(self):
         self.comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
         u = self.request.user

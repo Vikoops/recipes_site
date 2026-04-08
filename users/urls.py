@@ -1,4 +1,4 @@
-# users/urls.py
+
 from django.urls import path
 from django.conf import settings
 from django.urls import reverse_lazy
@@ -15,7 +15,7 @@ from .views import ProfileView, UserPasswordChangeView, RegisterView
 app_name = 'users'
 
 urlpatterns = [
-    # Вход / выход
+    
     path(
         'login/',
         LoginView.as_view(
@@ -26,11 +26,9 @@ urlpatterns = [
     ),
     path('logout/', LogoutView.as_view(), name='logout'),
 
-    # Профиль и смена пароля
     path('profile/', ProfileView.as_view(), name='profile'),
     path('password-change/', UserPasswordChangeView.as_view(), name='password_change'),
 
-    # Восстановление пароля
     path(
         'password-reset/',
         PasswordResetView.as_view(

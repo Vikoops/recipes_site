@@ -7,14 +7,12 @@ from .models import Recipe, Category, Tag
 def demo_queries():
     out = {}
 
-    # 1) Поиск с Q: "суп" в названии или описании среди опубликованных
     out['search_soup'] = list(
         Recipe.published
         .filter(Q(title__icontains='суп') | Q(desc__icontains='суп'))
         .values('title', 'slug')
     )
 
-    # 2) Вычисляемое поле: "Название (N мин)" — приводим число к строке через Cast
     out['title_with_time'] = list(
         Recipe.published
         .annotate(
@@ -28,7 +26,6 @@ def demo_queries():
         .values('title_with_time', 'slug')[:5]
     )
 
-    # 3) Группировка: сколько рецептов в каждой категории
     out['per_category'] = list(
         Category.objects
         .annotate(cnt=Count('recipes'))
@@ -36,7 +33,6 @@ def demo_queries():
         .order_by('-cnt', 'name')
     )
 
-    # 4) Агрегации времени готовки по категориям
     out['cook_stats'] = list(
         Recipe.objects
         .values('category__name')
@@ -48,7 +44,6 @@ def demo_queries():
         .order_by('category__name')
     )
 
-    # 5) Кол-во «быстрых» рецептов (тег fast)
     try:
         fast = Tag.objects.get(slug='fast')
         out['fast_count'] = Recipe.published.filter(tags=fast).count()

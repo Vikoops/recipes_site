@@ -3,26 +3,25 @@
    Палитра и общий тон
 */
 :root{
-  --brand:#7B3F00;          /* коричневый */
-  --brand-2:#5e2f00;        /* темнее */
-  --brand-3:#a45a1a;        /* светлее */
+  --brand:#7B3F00;       
+  --brand-2:#5e2f00;    
+  --brand-3:#a45a1a;   
   --ink:#2b2622;
   --muted:#6c625a;
   --paper:#fff;
   --paper-2:#faf7f3;
   --line:#ead9c6;
   --badge:#f7efe6;
-  --focus:#ffbf66;          /* акцент фокуса */
+  --focus:#ffbf66;       
   --ok:#1a7f37; --warn:#b7791f; --err:#c53030;
 }
 
-/* тестовый маркер можно убрать */
+
 body:after{
   content:"";
   display:none;
 }
 
-/* ===== ШАПКА И ХЛЕБНЫЕ КРОШКИ ===== */
 #header { background: var(--brand); border-bottom: 3px solid var(--brand-2); }
 #header a:link, #header a:visited { color:#fff; }
 #user-tools a:hover { text-decoration: underline; }
@@ -33,13 +32,13 @@ div.breadcrumbs{
   border-bottom: 1px solid rgba(0,0,0,.06);
 }
 
-/* ===== ОБЩИЕ УЛУЧШЕНИЯ ===== */
+
 body, input, select, textarea {
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 .content { padding-top: 18px; }
 
-/* карточные блоки админки */
+
 .module, .inline-group, .tabular inline-related {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -48,7 +47,6 @@ body, input, select, textarea {
   overflow: hidden;
 }
 
-/* заголовки таблиц/блоков */
 .module caption,
 #changelist .module caption{
   background: var(--badge);
@@ -57,7 +55,7 @@ body, input, select, textarea {
   border-bottom: 1px solid var(--line);
 }
 
-/* поля ввода */
+
 input[type=text], input[type=number], input[type=email],
 input[type=password], select, textarea{
   border: 1px solid var(--line) !important;
@@ -72,7 +70,7 @@ input:focus, select:focus, textarea:focus{
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 24%, transparent);
 }
 
-/* кнопки */
+
 .button, .submit-row input, input[type=submit], a.button{
   background: var(--brand);
   border-color: var(--brand-2);
@@ -87,7 +85,6 @@ input:focus, select:focus, textarea:focus{
 .button.default, .submit-row input.default { background: var(--brand-3); }
 .deletelink{ background: var(--err); border-color:#a12222; }
 
-/* нижняя панель сохранения */
 .submit-row{
   background: var(--paper-2);
   border-top: 1px solid var(--line);
@@ -95,7 +92,7 @@ input:focus, select:focus, textarea:focus{
   border-bottom-right-radius: 14px;
 }
 
-/* ===== САЙДБАР (меню слева) ===== */
+
 #nav-sidebar{
   background: var(--paper);
   border-right: 1px solid var(--line);
@@ -103,7 +100,7 @@ input:focus, select:focus, textarea:focus{
 #nav-sidebar .current-model{ background: var(--badge); }
 #nav-sidebar .app-recipes .model a { font-weight: 600; }
 
-/* ===== СПИСОК ЗАПИСЕЙ (changelist) ===== */
+
 .change-list .actions{
   background: var(--paper-2);
   border: 1px solid var(--line);
@@ -117,7 +114,6 @@ input:focus, select:focus, textarea:focus{
   min-width: 280px;
 }
 
-/* таблица результатов */
 .change-list .results table{
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -141,14 +137,14 @@ input:focus, select:focus, textarea:focus{
   padding: 10px 12px;
 }
 
-/* чекбоксы действий — чуть крупнее */
+
 .action-checkbox input{ transform: scale(1.12); }
 
-/* бейдж количества (в админ-списках) */
+
 td .inline-deletelink{ border-radius: 8px; }
 th .sorted .sortoptions{ opacity:.9; }
 
-/* ===== ФИЛЬТРЫ СПРАВА ===== */
+
 #changelist-filter{
   background: var(--paper);
   border:1px solid var(--line);
@@ -171,7 +167,7 @@ th .sorted .sortoptions{ opacity:.9; }
   background: var(--paper-2);
 }
 
-/* ===== МАЛЕНЬКИЕ ШТРИХИ ===== */
+
 a.addlink, a.changelink, a.deletelink, .object-tools a{
   border-radius: 10px !important;
 }
@@ -181,7 +177,6 @@ a.addlink, a.changelink, a.deletelink, .object-tools a{
 }
 .object-tools a:hover{ filter:brightness(1.06); }
 
-/* сообщения */
 .messagelist{
   border-radius: 12px;
   overflow:hidden;
@@ -194,7 +189,7 @@ a.addlink, a.changelink, a.deletelink, .object-tools a{
 .messagelist li.warning{ background: color-mix(in srgb, var(--warn) 12%, #fff); }
 .messagelist li.error{ background: color-mix(in srgb, var(--err) 12%, #fff); }
 
-/* пагинация */
+
 .paginator {
   border-top: 1px solid var(--line);
 }
@@ -210,14 +205,12 @@ a.addlink, a.changelink, a.deletelink, .object-tools a{
   font-weight:700;
 }
 
-/* фокусные обводки */
 :focus-visible{
   outline: 3px solid color-mix(in srgb, var(--focus) 50%, transparent);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* поддержка тёмных тем Windows/браузера — слегка приглушим бумагу */
 @media (prefers-color-scheme: dark){
   :root{
     --paper:#fdfbf9;
@@ -225,38 +218,36 @@ a.addlink, a.changelink, a.deletelink, .object-tools a{
   }
 }
 
-/* === БОЛЕЕ КОНТРАСТНЫЙ САЙДБАР АДМИНКИ === */
+
 #nav-sidebar{
   color:#2b2622;
 }
 
-/* заголовки блоков ("RECIPES", "ПОЛЬЗОВАТЕЛИ И ГРУППЫ") */
+
 #nav-sidebar .module caption{
-  background:#f1e6d6;          /* чётче фон */
-  color:#2b2622;                /* темнее текст */
+  background:#f1e6d6;        
+  color:#2b2622;        
   font-weight:800;
   letter-spacing:.02em;
 }
 
-/* строки и ссылки внутри списков моделей */
 #nav-sidebar .model a:link,
 #nav-sidebar .model a:visited{
-  color:#2b2622;                /* тёмный текст */
+  color:#2b2622;          
   font-weight:700;
   text-decoration:none;
 }
 #nav-sidebar .model a:hover{
-  color:#000;                   /* максимально контрастно при ховере */
+  color:#000;                
 }
 
-/* «Добавить» справа — тоже темнее */
 #nav-sidebar td a.addlink:link,
 #nav-sidebar td a.addlink:visited{
   color:#2b2622;
-  opacity:1;                    /* убираем возможную полупрозрачность темы */
+  opacity:1;           
 }
 
-/* активная строка в сайдбаре — читаемая */
+
 #nav-sidebar .current-model{
   background:#f7efe6;
 }
@@ -264,13 +255,13 @@ a.addlink, a.changelink, a.deletelink, .object-tools a{
   color:#000;
   font-weight:800;
 }
-/* === Контрастные заголовки секций админки === */
+
 #nav-sidebar .module caption,
 .module h2,
 .module caption,
 .inline-group h2 {
-    background: #a06d2a;    /* тёмный фон */
-    color: #fdc073;         /* светлый контрастный текст */
+    background: #a06d2a;   
+    color: #fdc073;     
     font-weight: bold;
     padding: 6px 10px;
     text-transform: uppercase;

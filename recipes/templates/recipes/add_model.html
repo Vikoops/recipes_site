@@ -10,7 +10,7 @@
     <div class="form-sub">Заполните поля ниже, все проверки происходят прямо при отправке.</div>
   </div>
 
-  {# сообщения Django #}
+ 
   {% if messages %}
     <ul class="msgs">
       {% for m in messages %}
@@ -19,7 +19,7 @@
     </ul>
   {% endif %}
 
-  {# общие ошибки формы #}
+ 
   {% if form.non_field_errors %}
     <div class="form-errors">
       <ul class="errorlist">

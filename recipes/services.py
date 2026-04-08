@@ -24,11 +24,7 @@ def delete_recipe(slug:str) -> int:
     return Recipe.objects.filter(slug=slug).delete()[0]
 
 def filter_search_sort(*, q:str='', difficulty:str='', is_published:bool|None=None, order:str='-created_at'):
-    """
-    Выборка + фильтрация + сортировка.
-    q — поиск по названию/описанию, difficulty — 'easy'|'medium'|'hard',
-    is_published — True/False/None, order — поле сортировки (например 'title' или '-created_at').
-    """
+    
     qs = Recipe.objects.all()
     if is_published is not None:
         qs = qs.filter(is_published=is_published)

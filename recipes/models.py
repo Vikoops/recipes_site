@@ -5,12 +5,12 @@ from django.conf import settings
 from django.db.models import Count, Q
 
 def recipe_photo_upload_to(instance, filename):
-    # имя типа recipes/<uuid>.ext
+   
     ext = os.path.splitext(filename)[1].lower()
     return f"recipes/{uuid.uuid4().hex}{ext}"
 
 class PublishedManager(models.Manager):
-    """Менеджер, показывающий только опубликованные рецепты."""
+    
     def get_queryset(self):
         return super().get_queryset().filter(is_published=True)
 
@@ -48,7 +48,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    """Основная модель рецепта."""
+   
     class Difficulty(models.TextChoices):
         EASY = "easy", "простая"
         MEDIUM = "medium", "средняя"
@@ -58,16 +58,16 @@ class Recipe(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='recipes',
-        null=True, blank=True,  # временно: потом при желании сделаем обязательным
+        null=True, blank=True, 
         verbose_name='Автор'
     )
 
     title = models.CharField("Название", max_length=255, db_index=True)
     slug = models.SlugField("Слаг", max_length=255, unique=True, db_index=True)
     desc = models.TextField("Описание", blank=True)
-    image = models.CharField("Путь к изображению", max_length=255, blank=True)  # путь в /static/...
-    cook_time = models.CharField("Время (текст)", max_length=50, blank=True)     # например: "45 мин"
-    cook_time_min = models.PositiveIntegerField("Время (мин)", default=0)        # число минут для агрегаций
+    image = models.CharField("Путь к изображению", max_length=255, blank=True)  
+    cook_time = models.CharField("Время (текст)", max_length=50, blank=True)     
+    cook_time_min = models.PositiveIntegerField("Время (мин)", default=0)       
     difficulty = models.CharField(
         "Сложность",
         max_length=10,
@@ -77,7 +77,7 @@ class Recipe(models.Model):
     is_published = models.BooleanField("Опубликован", default=True)
     photo = models.ImageField("Фото", upload_to=recipe_photo_upload_to, blank=True, null=True)
 
-    # Связи
+    
     category = models.ForeignKey(
         "Category",
         verbose_name="Категория",
@@ -85,20 +85,19 @@ class Recipe(models.Model):
         null=True,
         blank=True,
         related_name="recipes",
-    )  # 1 категория -> много рецептов
+    )  
 
     tags = models.ManyToManyField(
         "Tag",
         verbose_name="Теги",
         blank=True,
         related_name="recipes",
-    )  # многие теги <-> многие рецепты
+    )  
 
-    # служебные поля
+    
     created_at = models.DateTimeField("Создано", auto_now_add=True)
     updated_at = models.DateTimeField("Обновлено", auto_now=True)
 
-    # менеджеры
     objects = models.Manager()
     published = PublishedManager()
 
@@ -124,7 +123,7 @@ class Recipe(models.Model):
         return self.reactions.filter(kind='dislike').count()
 
 class RecipeInfo(models.Model):
-    """Доп.информация про рецепт (1 <-> 1)."""
+    
     recipe = models.OneToOneField(
         "Recipe",
         verbose_name="Рецепт",
@@ -166,6 +165,8 @@ class Comment(models.Model):
         permissions = [
             ('can_moderate_comments', 'Может модерировать комментарии'),
         ]
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return f'Комментарий к "{self.recipe.title}" от {self.author}'

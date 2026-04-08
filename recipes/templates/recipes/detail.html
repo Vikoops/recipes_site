@@ -34,22 +34,22 @@
   </p>
 
   <p class="action-row" style="margin-top:16px">
-    {# действия видны только авторизованным #}
+    
     {% if request.user.is_authenticated %}
 
-      {# Редактирование — автор рецепта ИЛИ право change_recipe #}
+      
       {% if request.user.pk == recipe.author_id or perms.recipes.change_recipe %}
         <a class="btn" href="{% url 'recipe_edit' recipe.slug %}">Редактировать</a>
       {% endif %}
 
-      {# Удаление — автор рецепта ИЛИ право delete_recipe #}
+    
       {% if request.user.pk == recipe.author_id or perms.recipes.delete_recipe %}
         <a class="btn ghost" href="{% url 'recipe_delete' recipe.slug %}">Удалить</a>
       {% endif %}
 
     {% endif %}
 
-    {# Публикация — у кого есть право can_publish #}
+   
     {% if perms.recipes.can_publish %}
       <form action="{% url 'recipe_publish_toggle' recipe.slug %}" method="post" style="display:inline">
         {% csrf_token %}
@@ -63,7 +63,6 @@
 
 <hr class="sep">
 
-{# -------------------- Лайки / Дизлайки -------------------- #}
 <section id="reactions" class="reactions">
   <h3>Оцените рецепт</h3>
 
@@ -95,7 +94,6 @@
 
 <hr class="sep">
 
-{# -------------------- Комментарии -------------------- #}
 <section id="comments" class="comments">
   <h2>Комментарии ({{ comments|length }})</h2>
 
@@ -107,7 +105,6 @@
             <b>{{ c.author.get_full_name|default:c.author.username }}</b>
             <span class="comment-date">{{ c.created_at|date:"d.m.Y H:i" }}</span>
 
-            {# Автор комментария ИЛИ модератор (can_moderate_comments) может удалить #}
             {% if request.user.is_authenticated %}
               {% if request.user.pk == c.author_id or perms.recipes.can_moderate_comments %}
                 <form action="{% url 'comment_delete' c.pk %}" method="post" style="margin-left:auto">
